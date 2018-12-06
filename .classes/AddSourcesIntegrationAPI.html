@@ -1,0 +1,234 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: AddSourcesIntegrationAPI</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">default</a> ]
+</div>
+
+<h1>Coverage Summary for Class: AddSourcesIntegrationAPI (default)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AddSourcesIntegrationAPI</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    58.3%
+  </span>
+  <span class="absValue">
+    (49/ 84)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+<h2>AddSourcesIntegrationAPI</h2>
+<div class="sourceCode"><i>1</i>&nbsp;public class AddSourcesIntegrationAPI {
+<i>2</i>&nbsp;    public static String continuationLabel;
+<i>3</i>&nbsp;    public static AddDeltaDTO deltaResult;
+<i>4</i>&nbsp;
+<b class="fc"><i>5</i>&nbsp;    public static RedResultDTO.RedItemDTO[] requestAllItems(){</b>
+<b class="fc"><i>6</i>&nbsp;        RedResultDTO.RedItemDTO[] allSources = new RedResultDTO.RedItemDTO[]{};</b>
+<b class="fc"><i>7</i>&nbsp;        Add_Source_API_Endpoints__mdt redAPIEndpoint = [Select endpoint__c, header_key__c, header_value__c, path__c, recurse__c, path_2__c</b>
+<b class="fc"><i>8</i>&nbsp;                                                        FROM Add_Source_API_Endpoints__mdt WHERE QualifiedApiName=:&#39;red_api&#39;];</b>
+<b class="fc"><i>9</i>&nbsp;        String endpointPath1 = redAPIEndpoint.endpoint__c + redAPIEndpoint.path__c;</b>
+<b class="fc"><i>10</i>&nbsp;        String endpointPath2 = redAPIEndpoint.endpoint__c + redAPIEndpoint.path_2__c;</b>
+<i>11</i>&nbsp;
+<b class="fc"><i>12</i>&nbsp;        try{</b>
+<b class="fc"><i>13</i>&nbsp;            Http http = new Http();</b>
+<b class="fc"><i>14</i>&nbsp;            HttpRequest request = requestBuilder(endpointPath1,&#39;GET&#39;, redAPIEndpoint.Header_Key__c, redAPIEndpoint.Header_Value__c, 120000);</b>
+<i>15</i>&nbsp;            //if(!Test.isRunningTest()){
+<b class="fc"><i>16</i>&nbsp;                HttpResponse response = http.send(request);</b>
+<i>17</i>&nbsp;
+<b class="fc"><i>18</i>&nbsp;                if(response.getStatusCode() == 200){</b>
+<b class="fc"><i>19</i>&nbsp;                    Type resultType = Type.forName(&#39;RedResultDTO&#39;);</b>
+<b class="fc"><i>20</i>&nbsp;                    RedResultDTO resultDTO = (RedResultDTO)JSON.deserialize(response.getBody(), resultType);</b>
+<b class="fc"><i>21</i>&nbsp;                    allSources = resultDTO.result;</b>
+<i>22</i>&nbsp;                }
+<i>23</i>&nbsp;                
+<i>24</i>&nbsp;            
+<i>25</i>&nbsp;            //Added 8/8 - Richard - Working on getting all items from both paths (/Volumes &amp; /mnt)
+<i>26</i>&nbsp;
+<b class="fc"><i>27</i>&nbsp;            Http http2 = new Http();</b>
+<b class="fc"><i>28</i>&nbsp;            HttpRequest request2 = requestBuilder(endpointPath2,&#39;GET&#39;, redAPIEndpoint.Header_Key__c, redAPIEndpoint.Header_Value__c, 120000);</b>
+<i>29</i>&nbsp;            //if(!Test.isRunningTest()){
+<b class="fc"><i>30</i>&nbsp;                HttpResponse response2 = http2.send(request2);</b>
+<i>31</i>&nbsp;
+<b class="fc"><i>32</i>&nbsp;                if(response2.getStatusCode() == 200){</b>
+<b class="fc"><i>33</i>&nbsp;                    Type resultType = Type.forName(&#39;RedResultDTO&#39;);</b>
+<b class="fc"><i>34</i>&nbsp;                    RedResultDTO resultDTO = (RedResultDTO)JSON.deserialize(response2.getBody(), resultType);</b>
+<b class="fc"><i>35</i>&nbsp;                    RedResultDTO.RedItemDTO[] sources = resultDTO.result;               </b>
+<b class="fc"><i>36</i>&nbsp;                  	allSources.addAll(sources);</b>
+<i>37</i>&nbsp;                }
+<i>38</i>&nbsp;               
+<b class="fc"><i>39</i>&nbsp;             mapPaths(allSources,&#39;/&#39;);</b>
+<i>40</i>&nbsp;             system.debug(&#39;allsources ===&gt;&#39; + allSources);
+<b class="fc"><i>41</i>&nbsp;             return allSources;</b>
+<i>42</i>&nbsp;            /*}
+<i>43</i>&nbsp;            else{
+<i>44</i>&nbsp;                return null;
+<i>45</i>&nbsp;            }*/
+<i>46</i>&nbsp;        }
+<b class="nc"><i>47</i>&nbsp;        catch(Exception e){</b>
+<b class="nc"><i>48</i>&nbsp;            allSources = requestAllItems();</b>
+<b class="nc"><i>49</i>&nbsp;            return allSources;</b>
+<i>50</i>&nbsp;        }
+<i>51</i>&nbsp;    }
+<i>52</i>&nbsp;
+<b class="nc"><i>53</i>&nbsp;    public static RedResultDTO.RedItemDTO[] requestItem(String endpointPostfix) {</b>
+<b class="nc"><i>54</i>&nbsp;        RedResultDTO.RedItemDTO[] allSources = new RedResultDTO.RedItemDTO[]{};</b>
+<b class="nc"><i>55</i>&nbsp;        Add_Source_API_Endpoints__mdt redAPIEndpoint = [Select endpoint__c, header_key__c, header_value__c, path__c, recurse__c, path_2__c</b>
+<b class="nc"><i>56</i>&nbsp;                                                        FROM Add_Source_API_Endpoints__mdt WHERE QualifiedApiName=:&#39;red_api&#39;];</b>
+<b class="nc"><i>57</i>&nbsp;        String endpoint1 = redAPIEndpoint.endpoint__c + redAPIEndpoint.path__c +&#39;/&#39; + endpointPostfix;</b>
+<b class="nc"><i>58</i>&nbsp;         String endpoint2 = redAPIEndpoint.endpoint__c + redAPIEndpoint.path_2__c + &#39;/&#39; + endpointPostfix;</b>
+<i>59</i>&nbsp;        System.debug(&#39;### endpoint: &#39; + endpoint1);
+<i>60</i>&nbsp;
+<b class="nc"><i>61</i>&nbsp;        try{</b>
+<b class="nc"><i>62</i>&nbsp;            Http http = new Http();</b>
+<b class="nc"><i>63</i>&nbsp;            HttpRequest request = requestBuilder(endpoint1,&#39;GET&#39;, redAPIEndpoint.Header_Key__c, redAPIEndpoint.Header_Value__c, 120000);</b>
+<b class="nc"><i>64</i>&nbsp;            HttpResponse response = http.send(request);</b>
+<b class="nc"><i>65</i>&nbsp;            if(response.getStatusCode() == 200){</b>
+<b class="nc"><i>66</i>&nbsp;                Type resultType = Type.forName(&#39;RedResultDTO&#39;);</b>
+<b class="nc"><i>67</i>&nbsp;                RedResultDTO resultDTO = (RedResultDTO)JSON.deserialize(response.getBody(), resultType);</b>
+<b class="nc"><i>68</i>&nbsp;                allSources = resultDTO.result;</b>
+<i>69</i>&nbsp;               
+<i>70</i>&nbsp;            } 
+<i>71</i>&nbsp;            
+<i>72</i>&nbsp;            
+<b class="nc"><i>73</i>&nbsp;            Http http2 = new Http();</b>
+<b class="nc"><i>74</i>&nbsp;            HttpRequest request2 = requestBuilder(endpoint2,&#39;GET&#39;, redAPIEndpoint.Header_Key__c, redAPIEndpoint.Header_Value__c, 120000);</b>
+<i>75</i>&nbsp;            //if(!Test.isRunningTest()){
+<b class="nc"><i>76</i>&nbsp;                HttpResponse response2 = http2.send(request2);</b>
+<i>77</i>&nbsp;
+<b class="nc"><i>78</i>&nbsp;                if(response2.getStatusCode() == 200){</b>
+<b class="nc"><i>79</i>&nbsp;                    Type resultType = Type.forName(&#39;RedResultDTO&#39;);</b>
+<b class="nc"><i>80</i>&nbsp;                    RedResultDTO resultDTO = (RedResultDTO)JSON.deserialize(response2.getBody(), resultType);</b>
+<b class="nc"><i>81</i>&nbsp;                    RedResultDTO.RedItemDTO[] sources = resultDTO.result;               </b>
+<b class="nc"><i>82</i>&nbsp;                  	allSources.addAll(sources);</b>
+<i>83</i>&nbsp;                }
+<i>84</i>&nbsp;               
+<i>85</i>&nbsp;            
+<i>86</i>&nbsp;             
+<b class="nc"><i>87</i>&nbsp;         mapPaths(allSources,&#39;/&#39;);</b>
+<i>88</i>&nbsp;         system.debug(&#39;allsources ===&gt;&#39; + allSources);
+<b class="nc"><i>89</i>&nbsp;         return allSources;</b>
+<i>90</i>&nbsp;        }
+<b class="nc"><i>91</i>&nbsp;        catch(Exception e){</b>
+<b class="nc"><i>92</i>&nbsp;            allSources = requestItem(endpointPostfix);</b>
+<b class="nc"><i>93</i>&nbsp;            return allSources;</b>
+<i>94</i>&nbsp;        }
+<i>95</i>&nbsp;        
+<i>96</i>&nbsp;        
+<i>97</i>&nbsp;        
+<i>98</i>&nbsp;        
+<i>99</i>&nbsp;       
+<i>100</i>&nbsp;    }
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;
+<b class="fc"><i>103</i>&nbsp;    public static AddDeltaDTO getAssets(String EidrId){</b>
+<b class="fc"><i>104</i>&nbsp;        AddDeltaDTO resultDTO = new AddDeltaDTO();</b>
+<b class="fc"><i>105</i>&nbsp;        Add_Source_API_Endpoints__mdt deltaAPIEndpoint = [Select endpoint__c, header_key__c, header_value__c, path__c, recurse__c</b>
+<b class="fc"><i>106</i>&nbsp;                                                          FROM Add_Source_API_Endpoints__mdt WHERE QualifiedApiName=:&#39;delta_api&#39; LIMIT 1];</b>
+<b class="fc"><i>107</i>&nbsp;        Http http = new Http();</b>
+<b class="fc"><i>108</i>&nbsp;        String endpoint = deltaAPIEndpoint.endpoint__c + &#39;/&#39; + EidrId + &#39;/assets&#39;;</b>
+<b class="fc"><i>109</i>&nbsp;        HttpRequest request = requestBuilder(endpoint,&#39;GET&#39;, deltaAPIEndpoint.Header_Key__c, deltaAPIEndpoint.Header_Value__c, 120000);</b>
+<i>110</i>&nbsp;
+<i>111</i>&nbsp;		System.debug( &#39;@@@ Endpoint: &#39; + endpoint );
+<i>112</i>&nbsp;		System.debug( &#39;@@@ Header Key: &#39; + deltaAPIEndpoint.Header_Key__c );
+<i>113</i>&nbsp;		System.debug( &#39;@@@ Header Value: &#39; + deltaAPIEndpoint.Header_Value__c );
+<i>114</i>&nbsp;		System.debug( &#39;@@@ Request: &#39; + request );
+<b class="fc"><i>115</i>&nbsp;        HttpResponse response = new HttpResponse();</b>
+<i>116</i>&nbsp;		//if(!Test.isRunningTest())
+<b class="fc"><i>117</i>&nbsp;			 response = http.send(request);</b>
+<b class="fc"><i>118</i>&nbsp;        try{</b>
+<b class="fc"><i>119</i>&nbsp;            if(response.getStatusCode() == 200){</b>
+<b class="fc"><i>120</i>&nbsp;                Type resultType = Type.forName(&#39;AddDeltaDTO&#39;);</b>
+<b class="fc"><i>121</i>&nbsp;                resultDTO = (AddDeltaDTO)JSON.deserialize(response.getBody(), resultType);</b>
+<i>122</i>&nbsp;				System.debug( &#39;@@@ resultDTO: &#39; + resultDTO );
+<i>123</i>&nbsp;
+<b class="fc"><i>124</i>&nbsp;                return resultDTO;</b>
+<i>125</i>&nbsp;            }
+<i>126</i>&nbsp;            else{
+<i>127</i>&nbsp;                System.debug(&#39;HTTP Request responded with error: &#39; + response.getStatusCode() + &#39; &#39; + response.getStatus());
+<b class="nc"><i>128</i>&nbsp;                return null;</b>
+<i>129</i>&nbsp;            }
+<i>130</i>&nbsp;        }
+<b class="nc"><i>131</i>&nbsp;        catch(Exception e){</b>
+<i>132</i>&nbsp;			System.debug( &#39;@@@ Exception: &#39; + e );
+<b class="nc"><i>133</i>&nbsp;            return null;</b>
+<i>134</i>&nbsp;        }
+<i>135</i>&nbsp;
+<i>136</i>&nbsp;    }
+<i>137</i>&nbsp;
+<i>138</i>&nbsp;
+<b class="fc"><i>139</i>&nbsp;    public static HttpRequest requestBuilder(String endpoint, String method, String headerKey, String headerValue, Integer timeOut){</b>
+<b class="fc"><i>140</i>&nbsp;        HttpRequest request = new HttpRequest();</b>
+<b class="fc"><i>141</i>&nbsp;        request.setEndpoint(endpoint);</b>
+<b class="fc"><i>142</i>&nbsp;        request.setMethod(method);</b>
+<b class="fc"><i>143</i>&nbsp;        request.setHeader(headerKey, headerValue);</b>
+<b class="fc"><i>144</i>&nbsp;		request.setTimeout(timeOut);</b>
+<b class="fc"><i>145</i>&nbsp;        return request;</b>
+<i>146</i>&nbsp;    }
+<i>147</i>&nbsp;
+<i>148</i>&nbsp;    /*For Red API: Recursive method to iterate through the Directory tree structure and populate paths on files.
+<i>149</i>&nbsp;     * Lists are passed by Reference in Apex so we only need to iterate the existing list.
+<i>150</i>&nbsp;    */
+<b class="fc"><i>151</i>&nbsp;    public static void mapPaths(RedResultDTO.RedItemDTO[] nodes, String path){</b>
+<b class="fc"><i>152</i>&nbsp;        for(RedResultDTO.RedItemDTO item : nodes){</b>
+<b class="fc"><i>153</i>&nbsp;            if(item.files != null){</b>
+<b class="nc"><i>154</i>&nbsp;                item.path = path;</b>
+<b class="nc"><i>155</i>&nbsp;                mapPaths(item.files, path + item.name + &#39;/&#39;);</b>
+<i>156</i>&nbsp;            }
+<i>157</i>&nbsp;            else{
+<b class="fc"><i>158</i>&nbsp;                item.path = path;</b>
+<i>159</i>&nbsp;            }
+<i>160</i>&nbsp;        }
+<i>161</i>&nbsp;    }
+<i>162</i>&nbsp;
+<i>163</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-12-06 13:57</div>
+</div>
+</body>
+</html>

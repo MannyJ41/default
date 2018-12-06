@@ -1,0 +1,129 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: AddDeltaController</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">default</a> ]
+</div>
+
+<h1>Coverage Summary for Class: AddDeltaController (default)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AddDeltaController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.1%
+  </span>
+  <span class="absValue">
+    (27/ 31)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+<h2>AddDeltaController</h2>
+<div class="sourceCode"><i>1</i>&nbsp;public class AddDeltaController {
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;    @AuraEnabled
+<b class="fc"><i>4</i>&nbsp;    public static QA_Title__c getTitle(String workOrderId){</b>
+<b class="fc"><i>5</i>&nbsp;        WOS_Order__c workOrder = [Select Title__c FROM WOS_Order__c WHERE Id =: workOrderId LIMIT 1];</b>
+<b class="fc"><i>6</i>&nbsp;        QA_Title__c title = [Select Id, Title_Name__c, EIDR_ID__c FROM QA_Title__c WHERE Id =: workOrder.Title__c LIMIT 1] ;</b>
+<b class="fc"><i>7</i>&nbsp;        return title;</b>
+<i>8</i>&nbsp;    }
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;    @AuraEnabled
+<b class="fc"><i>11</i>&nbsp;    public static QA_Title__c searchTitle(String searchInput){</b>
+<b class="fc"><i>12</i>&nbsp;        List&lt;QA_Title__c&gt; title = [Select Id, Title_Name__c, EIDR_ID__c FROM QA_Title__c WHERE Title_Name__c = :searchInput];</b>
+<b class="fc"><i>13</i>&nbsp;        if(title != null &amp;&amp; title.size()&gt;0){</b>
+<b class="fc"><i>14</i>&nbsp;            return title[0];</b>
+<i>15</i>&nbsp;        }
+<i>16</i>&nbsp;        else{
+<b class="fc"><i>17</i>&nbsp;            return null;</b>
+<i>18</i>&nbsp;        }
+<i>19</i>&nbsp;    }
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    @AuraEnabled
+<b class="fc"><i>22</i>&nbsp;    public static List&lt;WOS_Source__c&gt; getAssets(String eidrId){</b>
+<b class="fc"><i>23</i>&nbsp;        List&lt;WOS_Source__c&gt; sources = new List&lt;WOS_Source__c&gt;();</b>
+<b class="fc"><i>24</i>&nbsp;        AddDeltaDTO result = AddSourcesIntegrationAPI.getAssets(eidrId);</b>
+<b class="fc"><i>25</i>&nbsp;        if(result!=null &amp;&amp; result.assets!=null &amp;&amp; result.assets.size()&gt;0){</b>
+<b class="fc"><i>26</i>&nbsp;            for(AddDeltaDTO.AssetDTO asset : result.assets){</b>
+<b class="fc"><i>27</i>&nbsp;                if(asset.sourceDetails != null &amp;&amp; asset.sourceDetails.size()&gt;0){</b>
+<b class="fc"><i>28</i>&nbsp;                    AddDeltaDTO.SourceDetailsDTO sourceDetails = asset.sourceDetails[0];</b>
+<b class="fc"><i>29</i>&nbsp;                    WOS_Source__c newSource = new WOS_Source__c();</b>
+<b class="fc"><i>30</i>&nbsp;                    newSource.File_Path__c = sourceDetails.location;</b>
+<b class="fc"><i>31</i>&nbsp;                    newSource.Name = sourceDetails.sourceId;</b>
+<b class="fc"><i>32</i>&nbsp;					newSource.System__c = &#39;DELTA&#39;;</b>
+<b class="fc"><i>33</i>&nbsp;                    sources.add(newSource);</b>
+<i>34</i>&nbsp;                }
+<i>35</i>&nbsp;            }
+<b class="fc"><i>36</i>&nbsp;            return sources;</b>
+<i>37</i>&nbsp;        }
+<i>38</i>&nbsp;        else{
+<b class="nc"><i>39</i>&nbsp;            return null;</b>
+<i>40</i>&nbsp;        }
+<i>41</i>&nbsp;    }
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;    @AuraEnabled
+<b class="fc"><i>44</i>&nbsp;	public static List&lt;WOS_Source__c&gt; createSources(List&lt;WOS_Source__c&gt; newSources){</b>
+<b class="fc"><i>45</i>&nbsp;        try{</b>
+<b class="fc"><i>46</i>&nbsp;            insert newSources;</b>
+<b class="nc"><i>47</i>&nbsp;			for(WOS_Source__c source : newSources){</b>
+<b class="nc"><i>48</i>&nbsp;                source.Name = source.id;</b>
+<i>49</i>&nbsp;            }
+<b class="nc"><i>50</i>&nbsp;            return newSources;</b>
+<i>51</i>&nbsp;        }
+<b class="fc"><i>52</i>&nbsp;        catch (DMLException e){</b>
+<i>53</i>&nbsp;			System.debug( e );
+<b class="fc"><i>54</i>&nbsp;            return null;</b>
+<i>55</i>&nbsp;        }
+<i>56</i>&nbsp;    }
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-12-06 13:57</div>
+</div>
+</body>
+</html>

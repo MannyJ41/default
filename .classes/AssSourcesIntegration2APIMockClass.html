@@ -1,0 +1,96 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: AssSourcesIntegration2APIMockClass</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">default</a> ]
+</div>
+
+<h1>Coverage Summary for Class: AssSourcesIntegration2APIMockClass (default)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AssSourcesIntegration2APIMockClass</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/ 16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+<h2>AssSourcesIntegration2APIMockClass</h2>
+<div class="sourceCode"><i>1</i>&nbsp;global class AssSourcesIntegration2APIMockClass implements  HttpCalloutMock{
+<b class="fc"><i>2</i>&nbsp;	global HTTPResponse respond(HTTPRequest req) {</b>
+<i>3</i>&nbsp;        // Optionally, only send a mock response for a specific endpoint
+<i>4</i>&nbsp;        // and method.
+<i>5</i>&nbsp;        //System.assertEquals(&#39;http://example.com/example/test&#39;, req.getEndpoint());
+<b class="fc"><i>6</i>&nbsp;        System.assertEquals(&#39;GET&#39;, req.getMethod());</b>
+<i>7</i>&nbsp;        
+<i>8</i>&nbsp;        // Create a fake response
+<b class="fc"><i>9</i>&nbsp;        HttpResponse res = new HttpResponse();</b>
+<b class="fc"><i>10</i>&nbsp;        res.setHeader(&#39;Content-Type&#39;, &#39;application/json&#39;);</b>
+<b class="fc"><i>11</i>&nbsp;        RedResultDTO temp = new RedResultDTO();</b>
+<b class="fc"><i>12</i>&nbsp;        RedResultDTO.RedItemDTO tempSource = new RedResultDTO.RedItemDTO();</b>
+<b class="fc"><i>13</i>&nbsp;        tempSource.key = &#39;testtt&#39;;</b>
+<b class="fc"><i>14</i>&nbsp;         tempSource.label = &#39;Integration&#39;;</b>
+<b class="fc"><i>15</i>&nbsp;         tempSource.name = &#39;DD-MM-YY&#39;;</b>
+<b class="fc"><i>16</i>&nbsp;        list&lt;RedResultDTO.RedItemDTO&gt; tempSourceArray = new list&lt;RedResultDTO.RedItemDTO&gt;();</b>
+<b class="fc"><i>17</i>&nbsp;        tempSourceArray.add(tempSource);</b>
+<i>18</i>&nbsp;        
+<b class="fc"><i>19</i>&nbsp;        temp.result = tempSourceArray;</b>
+<b class="fc"><i>20</i>&nbsp;        String responseBody = JSON.serialize(temp);</b>
+<b class="fc"><i>21</i>&nbsp;        res.setBody(responseBody);</b>
+<b class="fc"><i>22</i>&nbsp;        res.setStatusCode(200);</b>
+<b class="fc"><i>23</i>&nbsp;        return res;</b>
+<i>24</i>&nbsp;    }
+<i>25</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-12-06 13:57</div>
+</div>
+</body>
+</html>

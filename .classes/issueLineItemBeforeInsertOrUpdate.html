@@ -1,0 +1,128 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: issueLineItemBeforeInsertOrUpdate</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">default</a> ]
+</div>
+
+<h1>Coverage Summary for Class: issueLineItemBeforeInsertOrUpdate (default)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">issueLineItemBeforeInsertOrUpdate</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+<h2>issueLineItemBeforeInsertOrUpdate</h2>
+<div class="sourceCode"><i>1</i>&nbsp;trigger issueLineItemBeforeInsertOrUpdate on QA_Issue_Line_Item__c (before insert, before update, after insert, after update) {
+<i>2</i>&nbsp;    /*try {
+<i>3</i>&nbsp;    //Map to store WO id&#39;s related to the Line Item&#39;s QC Report
+<i>4</i>&nbsp;    Map&lt;Id, List&lt;QA_Issue_Line_Item__c&gt;&gt; workOrderWithLineItems = new Map&lt;Id, List&lt;QA_Issue_Line_Item__c&gt;&gt;();
+<i>5</i>&nbsp;    Map&lt;Id, List&lt;QA_Issue_Line_Item__c&gt;&gt; AssetWithLineItems = new Map&lt;Id,List&lt;QA_Issue_Line_Item__c&gt;&gt;();
+<i>6</i>&nbsp;    List&lt;Task_Issue__c&gt; taskIssuesToBeCreated = new List&lt;Task_Issue__c&gt;();
+<i>7</i>&nbsp;    Map&lt;Id, WOS_Task__c&gt; woTaskToBeUpdated = new Map&lt;Id, WOS_Task__c&gt;();
+<i>8</i>&nbsp;    List&lt;Asset_Issue__c&gt; assetIssuesToBeCreated = new List&lt;Asset_Issue__c&gt;();
+<i>9</i>&nbsp;    List&lt;QA_Asset__c&gt; assetToBeUpdated = new List&lt;QA_Asset__c&gt;();
+<i>10</i>&nbsp;    Set&lt;Id&gt; setOfRemediationInitTasksId = new Set&lt;Id&gt;();
+<i>11</i>&nbsp;    
+<i>12</i>&nbsp;    if (trigger.isBefore &amp;&amp; trigger.isInsert) {
+<i>13</i>&nbsp;        IssueLineItemHandler.isBeforeInsert(Trigger.New);
+<i>14</i>&nbsp;    }
+<i>15</i>&nbsp;    
+<i>16</i>&nbsp;    if (trigger.isBefore &amp;&amp; trigger.isUpdate) {
+<i>17</i>&nbsp;        IssueLineItemHandler.isBeforeupdate(Trigger.NewMap, Trigger.OldMap);
+<i>18</i>&nbsp;    }
+<i>19</i>&nbsp;    
+<i>20</i>&nbsp;    if(trigger.isAfter &amp;&amp; trigger.isUpdate) {
+<i>21</i>&nbsp;        IssueLineItemHandler.isAfterupdate(Trigger.NewMap, Trigger.OldMap);
+<i>22</i>&nbsp;    }
+<i>23</i>&nbsp;    
+<i>24</i>&nbsp;    if(trigger.isAfter &amp;&amp; (trigger.isInsert || trigger.isUpdate)) {
+<i>25</i>&nbsp;        
+<i>26</i>&nbsp;        if (trigger.isupdate) {
+<i>27</i>&nbsp;            List&lt;Parent_Issue_Line_Item__c&gt; listOfParentIssueLineItem = new List&lt;Parent_Issue_Line_Item__c&gt;();
+<i>28</i>&nbsp;            Set&lt;Id&gt; parentIssueLineItemsId = new Set&lt;id&gt;();
+<i>29</i>&nbsp;            Set&lt;Id&gt; issueLineItemsId = new Set&lt;Id&gt;();
+<i>30</i>&nbsp;            
+<i>31</i>&nbsp;            Map&lt;Id, Boolean&gt; mapOfParentIdAndRemediation = new Map&lt;Id, Boolean&gt;();
+<i>32</i>&nbsp;            
+<i>33</i>&nbsp;            for (QA_Issue_Line_Item__c iliInstance : [SELECT Id, Parent_Issue_Line_Item__c, Final_Status__c, QC_Report__r.Final_Review_Status__c, KickOff_Remediation__c FROM QA_Issue_Line_Item__c WHERE Id IN :Trigger.New]) {
+<i>34</i>&nbsp;                //Logic for updation of the parent issue line item
+<i>35</i>&nbsp;                if (iliInstance.Parent_Issue_Line_Item__c != null) {
+<i>36</i>&nbsp;                    parentIssueLineItemsId.add(iliInstance.Parent_Issue_Line_Item__c);
+<i>37</i>&nbsp;                    issueLineItemsId.add(iliInstance.Id);
+<i>38</i>&nbsp;                    
+<i>39</i>&nbsp;                    if (iliInstance.KickOff_Remediation__c != Trigger.OldMap.get(iliInstance.Id).KickOff_Remediation__c &amp;&amp; iliInstance.KickOff_Remediation__c == true) {
+<i>40</i>&nbsp;                         mapOfParentIdAndRemediation.put(iliInstance.Id, true);    
+<i>41</i>&nbsp;                    } else {
+<i>42</i>&nbsp;                        mapOfParentIdAndRemediation.put(iliInstance.Id, false);
+<i>43</i>&nbsp;                    }
+<i>44</i>&nbsp;                    
+<i>45</i>&nbsp;                 }   
+<i>46</i>&nbsp;            }
+<i>47</i>&nbsp;            
+<i>48</i>&nbsp;            for (Parent_Issue_Line_Item__c eachParentIssue : [
+<i>49</i>&nbsp;                SELECT Id, 
+<i>50</i>&nbsp;                (SELECT Id, Parent_Issue_Line_Item__c, Component__c, Description__c, Final_Severity__c, Final_Status__c,
+<i>51</i>&nbsp;                 Issue_Type__c, QC_Evaluation__c, Severity__c, TC_In__c, TC_Out__c, KickOff_Remediation__c
+<i>52</i>&nbsp;                 FROM Issue_Line_Items__r
+<i>53</i>&nbsp;                 ORDER BY CreatedDate DESC)
+<i>54</i>&nbsp;                FROM Parent_Issue_Line_Item__c
+<i>55</i>&nbsp;                WHERE Id IN :parentIssueLineItemsId
+<i>56</i>&nbsp;            ]) {
+<i>57</i>&nbsp;                if (eachParentIssue.Issue_Line_Items__r.size() &gt; 0 &amp;&amp; 
+<i>58</i>&nbsp;                    issueLineItemsId.contains(eachParentIssue.Issue_Line_Items__r[0].Id)) {
+<i>59</i>&nbsp;                    //do the updation
+<i>60</i>&nbsp;                    Parent_Issue_Line_Item__c eachParentLineItem = new Parent_Issue_Line_Item__c();
+<i>61</i>&nbsp;                    eachParentLineItem.Id = eachParentIssue.Issue_Line_Items__r[0].Parent_Issue_Line_Item__c;
+<i>62</i>&nbsp;                    eachParentLineItem.Component__c = eachParentIssue.Issue_Line_Items__r[0].Component__c;
+<i>63</i>&nbsp;                    eachParentLineItem.Description__c = eachParentIssue.Issue_Line_Items__r[0].Description__c;
+<i>64</i>&nbsp;                    eachParentLineItem.Final_Severity__c = eachParentIssue.Issue_Line_Items__r[0].Final_Severity__c;
+<i>65</i>&nbsp;                    eachParentLineItem.Final_Status__c = eachParentIssue.Issue_Line_Items__r[0].Final_Status__c;
+<i>66</i>&nbsp;                    eachParentLineItem.Issue_Type__c = eachParentIssue.Issue_Line_Items__r[0].Issue_Type__c;
+<i>67</i>&nbsp;                    eachParentLineItem.QC_Evaluation__c = eachParentIssue.Issue_Line_Items__r[0].QC_Evaluation__c;
+<i>68</i>&nbsp;                    eachParentLineItem.QC_Severity__c = eachParentIssue.Issue_Line_Items__r[0].Severity__c;
+<i>69</i>&nbsp;                    eachParentLineItem.TC_In__c = eachParentIssue.Issue_Line_Items__r[0].TC_In__c;
+<i>70</i>&nbsp;                    eachParentLineItem.TC_Out__c = eachParentIssue.Issue_Line_Items__r[0].TC_Out__c;
+<i>71</i>&nbsp;                    listOfParentIssueLineItem.add(eachParentLineItem);
+<i>72</i>&nbsp;                }
+<i>73</i>&nbsp;            }
+<i>74</i>&nbsp;            update listOfParentIssueLineItem;
+<i>75</i>&nbsp;        }
+<i>76</i>&nbsp;        
+<i>77</i>&nbsp;    }
+<i>78</i>&nbsp;    } catch(Exception e) {
+<i>79</i>&nbsp;        System.debug(&#39;message&#39;+e.getMessage()+&#39;-----&#39;+e.getLineNumber()+&#39;----&#39;+e.getStackTraceString()+&#39;--&#39;);
+<i>80</i>&nbsp;    }*/
+<i>81</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-12-06 13:57</div>
+</div>
+</body>
+</html>

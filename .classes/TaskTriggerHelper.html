@@ -1,0 +1,429 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TaskTriggerHelper</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">default</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TaskTriggerHelper (default)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TaskTriggerHelper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 141)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+<h2>TaskTriggerHelper</h2>
+<div class="sourceCode"><i>1</i>&nbsp;public without sharing class TaskTriggerHelper {
+<b class="nc"><i>2</i>&nbsp;    public static boolean avoidRecurssiveTaskTriggerCall = false;</b>
+<b class="nc"><i>3</i>&nbsp;    public void onBeforeDelete(Map&lt;Id, WOS_Task__c&gt; triggerOldMap){</b>
+<b class="nc"><i>4</i>&nbsp;        Set&lt;Id&gt; taskIds = new Set&lt;Id&gt;();</b>
+<b class="nc"><i>5</i>&nbsp;        List&lt;WOS_Task_Dependency__c&gt; associatedDependencies = [</b>
+<i>6</i>&nbsp;            SELECT Id,  Work_Order__c, Predecessor_Task__c, Task__c
+<i>7</i>&nbsp;            FROM WOS_Task_Dependency__c
+<b class="nc"><i>8</i>&nbsp;            WHERE Predecessor_Task__c IN :triggerOldMap.keySet()];</b>
+<i>9</i>&nbsp;        
+<b class="nc"><i>10</i>&nbsp;        if(associatedDependencies!=null &amp;&amp; associatedDependencies.size()&gt;0){</b>
+<b class="nc"><i>11</i>&nbsp;            for(WOS_Task_Dependency__c link : associatedDependencies){</b>
+<b class="nc"><i>12</i>&nbsp;                taskIds.add(link.Task__c);</b>
+<i>13</i>&nbsp;            }
+<i>14</i>&nbsp;            
+<b class="nc"><i>15</i>&nbsp;            List&lt;WOS_Task__c&gt; dependantTasks = [</b>
+<i>16</i>&nbsp;                SELECT Id, Task_Name__c, Name, Pending_Predecessors__c
+<i>17</i>&nbsp;                FROM WOS_Task__c
+<b class="nc"><i>18</i>&nbsp;                WHERE Id IN :taskIds];</b>
+<i>19</i>&nbsp;            
+<b class="nc"><i>20</i>&nbsp;            for(WOS_Task__c task : dependantTasks){</b>
+<b class="nc"><i>21</i>&nbsp;                if(task.Pending_Predecessors__c &gt; 0){</b>
+<b class="nc"><i>22</i>&nbsp;                    task.Pending_Predecessors__c  =  task.Pending_Predecessors__c  - 1;</b>
+<i>23</i>&nbsp;                }
+<i>24</i>&nbsp;            }
+<b class="nc"><i>25</i>&nbsp;            update dependantTasks;</b>
+<b class="nc"><i>26</i>&nbsp;            delete associatedDependencies;</b>
+<i>27</i>&nbsp;        }
+<i>28</i>&nbsp;        
+<i>29</i>&nbsp;    }
+<i>30</i>&nbsp;    
+<i>31</i>&nbsp;    
+<b class="nc"><i>32</i>&nbsp;    public void onAfterUpdate(Map&lt;Id, WOS_Task__c&gt; triggerNewMap, Map&lt;Id, WOS_Task__c&gt; triggerOldMap){</b>
+<b class="nc"><i>33</i>&nbsp;        Map&lt;Id, List&lt;WOS_Task_Dependency__c&gt;&gt; dependenciesMap = new Map&lt;Id, List&lt;WOS_Task_Dependency__c&gt;&gt;();</b>
+<b class="nc"><i>34</i>&nbsp;        Map&lt;Id, WOS_Task__c&gt; dependantTasksMap = new  Map&lt;Id, WOS_Task__c&gt;();</b>
+<b class="nc"><i>35</i>&nbsp;        Set&lt;Id&gt; dependantTaskIds = new Set&lt;Id&gt;();</b>
+<b class="nc"><i>36</i>&nbsp;        List&lt;WOS_Task__c&gt; tasksToUpdate = new List&lt;WOS_Task__c&gt;();</b>
+<b class="nc"><i>37</i>&nbsp;        List&lt;WOS_Task_Dependency__c&gt; associatedDependencies = [SELECT Id, Work_Order__c, Predecessor_Task__c, Task__c</b>
+<i>38</i>&nbsp;                                                               FROM WOS_Task_Dependency__c
+<b class="nc"><i>39</i>&nbsp;                                                               WHERE Predecessor_Task__c IN :triggerNewMap.keySet()];</b>
+<i>40</i>&nbsp;        
+<b class="nc"><i>41</i>&nbsp;        if(associatedDependencies != null &amp;&amp; associatedDependencies.size()&gt;0){</b>
+<i>42</i>&nbsp;            // One Task can have many dependencies so we Map each Task Id to a list of dependencies
+<b class="nc"><i>43</i>&nbsp;            for(WOS_Task_Dependency__c link : associatedDependencies){</b>
+<b class="nc"><i>44</i>&nbsp;                dependantTaskIds.add(link.Task__c);</b>
+<i>45</i>&nbsp;                
+<b class="nc"><i>46</i>&nbsp;                if(dependenciesMap.get(link.Predecessor_Task__c)!=null){</b>
+<b class="nc"><i>47</i>&nbsp;                    dependenciesMap.get(link.Predecessor_Task__c).add(link);</b>
+<i>48</i>&nbsp;                }
+<i>49</i>&nbsp;                else{
+<b class="nc"><i>50</i>&nbsp;                    List&lt;WOS_Task_Dependency__c&gt; dependencies = new List&lt;WOS_Task_Dependency__c&gt;();</b>
+<b class="nc"><i>51</i>&nbsp;                    dependencies.add(link);</b>
+<b class="nc"><i>52</i>&nbsp;                    dependenciesMap.put(link.Predecessor_Task__c, dependencies);</b>
+<i>53</i>&nbsp;                }
+<i>54</i>&nbsp;            }
+<i>55</i>&nbsp;            
+<b class="nc"><i>56</i>&nbsp;            List&lt;WOS_Task__c&gt; dependantTasks = [SELECT Id, Name, Task_Name__c, Pending_Predecessors__c , Percentage__c,  Due_Date__c</b>
+<i>57</i>&nbsp;                                                FROM WOS_Task__c
+<b class="nc"><i>58</i>&nbsp;                                                WHERE Id IN :dependantTaskIds];</b>
+<i>59</i>&nbsp;            
+<b class="nc"><i>60</i>&nbsp;            for(WOS_Task__c task : dependantTasks){</b>
+<b class="nc"><i>61</i>&nbsp;                dependantTasksMap.put(task.Id, task);</b>
+<i>62</i>&nbsp;            }
+<i>63</i>&nbsp;            
+<b class="nc"><i>64</i>&nbsp;            for(WOS_Task__c newTaskInstanceValue: triggerNewMap.values()){</b>
+<b class="nc"><i>65</i>&nbsp;                WOS_Task__c oldTaskInstanceValue = triggerOldMap.get(newTaskInstanceValue.Id);</b>
+<i>66</i>&nbsp;                
+<b class="nc"><i>67</i>&nbsp;                Integer dateDiff = oldTaskInstanceValue.Due_Date__c.daysBetween(newTaskInstanceValue.Due_Date__c);</b>
+<i>68</i>&nbsp;                
+<b class="nc"><i>69</i>&nbsp;                if(dependenciesMap.get(newTaskInstanceValue.Id) != null){</b>
+<b class="nc"><i>70</i>&nbsp;                    for(WOS_Task_Dependency__c link : dependenciesMap.get(newTaskInstanceValue.Id)){</b>
+<b class="nc"><i>71</i>&nbsp;                        WOS_Task__c dependentTask = dependantTasksMap.get(link.Task__c);</b>
+<b class="nc"><i>72</i>&nbsp;                        if (dependentTask != null) {</b>
+<i>73</i>&nbsp;                            
+<b class="nc"><i>74</i>&nbsp;                            if(newTaskInstanceValue.Percentage__c == &#39;100&#39;){</b>
+<b class="nc"><i>75</i>&nbsp;                                if(dependentTask.Pending_Predecessors__c &gt; 0){</b>
+<b class="nc"><i>76</i>&nbsp;                                    dependentTask.Pending_Predecessors__c = dependentTask.Pending_Predecessors__c  - 1;</b>
+<i>77</i>&nbsp;                                }
+<i>78</i>&nbsp;                            }
+<i>79</i>&nbsp;                            
+<b class="nc"><i>80</i>&nbsp;                            if((oldTaskInstanceValue.Percentage__c==&#39;100&#39;) &amp;&amp; (newTaskInstanceValue.Percentage__c!=&#39;100&#39;)) {</b>
+<b class="nc"><i>81</i>&nbsp;                                dependentTask.Pending_Predecessors__c  =  dependentTask.Pending_Predecessors__c  + 1;</b>
+<i>82</i>&nbsp;                            }
+<i>83</i>&nbsp;                            
+<b class="nc"><i>84</i>&nbsp;                            if((dateDiff != 0) &amp;&amp; (dependentTask.Percentage__c!=&#39;100&#39;)){</b>
+<b class="nc"><i>85</i>&nbsp;                                dependentTask.Due_Date__c = dependentTask.Due_Date__c + dateDiff;</b>
+<i>86</i>&nbsp;                            }
+<b class="nc"><i>87</i>&nbsp;                            tasksToUpdate.add(dependentTask);</b>
+<i>88</i>&nbsp;                        }
+<i>89</i>&nbsp;                    }
+<i>90</i>&nbsp;                }
+<i>91</i>&nbsp;            }
+<b class="nc"><i>92</i>&nbsp;            if(tasksToUpdate!=null &amp;&amp; tasksToUpdate.size()&gt;0){</b>
+<i>93</i>&nbsp;                system.debug(&#39;@@@tasksToUpdate&#39; + tasksToUpdate);
+<b class="nc"><i>94</i>&nbsp;                if(avoidRecurssiveTaskTriggerCall = false)</b>
+<i>95</i>&nbsp;                {
+<b class="nc"><i>96</i>&nbsp;                    update tasksToUpdate;</b>
+<b class="nc"><i>97</i>&nbsp;                    avoidRecurssiveTaskTriggerCall = true;</b>
+<i>98</i>&nbsp;                }
+<i>99</i>&nbsp;            }
+<i>100</i>&nbsp;        }
+<i>101</i>&nbsp;        
+<i>102</i>&nbsp;        // Added by Chetan 5/9
+<i>103</i>&nbsp;        
+<i>104</i>&nbsp;        /*for(WOS_Task__c newTaskInstanceValue: triggerNewMap.values()){
+<i>105</i>&nbsp;            WOS_Task__c oldTaskInstanceValue = triggerOldMap.get(newTaskInstanceValue.Id);
+<i>106</i>&nbsp;            
+<i>107</i>&nbsp;            if(newTaskInstanceValue.Assigned_To__c != oldTaskInstanceValue.Assigned_To__c)
+<i>108</i>&nbsp;            {
+<i>109</i>&nbsp;                List&lt;WOS_Task__c&gt; updatedTasks = [SELECT Id, Assigned_To__c, OwnerId FROM WOS_Task__c WHERE Id IN :triggerNewMap.keySet()];
+<i>110</i>&nbsp;                dependantTaskIds = new Set&lt;Id&gt;();
+<i>111</i>&nbsp;                tasksToUpdate = new List&lt;WOS_Task__c&gt;();
+<i>112</i>&nbsp;                Map&lt;Id, WOS_Resource__c&gt; dependantResourcesMap = new  Map&lt;Id, WOS_Resource__c&gt;();
+<i>113</i>&nbsp;                
+<i>114</i>&nbsp;                for(WOS_Task__c task : updatedTasks){
+<i>115</i>&nbsp;                    dependantTaskIds.add(task.Assigned_To__c);
+<i>116</i>&nbsp;                }
+<i>117</i>&nbsp;                
+<i>118</i>&nbsp;                List&lt;WOS_Resource__c&gt; associatedResources = [SELECT Id, User__c FROM WOS_Resource__c WHERE Id IN :dependantTaskIds];
+<i>119</i>&nbsp;                
+<i>120</i>&nbsp;                for(WOS_Resource__c resource : associatedResources){
+<i>121</i>&nbsp;                    dependantResourcesMap.put(resource.Id, resource);
+<i>122</i>&nbsp;                }
+<i>123</i>&nbsp;                
+<i>124</i>&nbsp;                for(WOS_Task__c task : updatedTasks){
+<i>125</i>&nbsp;                    WOS_Resource__c resource = dependantResourcesMap.get(task.Assigned_To__c);
+<i>126</i>&nbsp;                    task.OwnerId = resource.User__c;
+<i>127</i>&nbsp;                    tasksToUpdate.add(task);
+<i>128</i>&nbsp;                }
+<i>129</i>&nbsp;            }
+<i>130</i>&nbsp;            
+<i>131</i>&nbsp;        }*/
+<i>132</i>&nbsp;        //rectified by trifinlabs
+<i>133</i>&nbsp;       /* Map&lt;Id, WOS_Resource__c&gt; dependantResourcesMap = new  Map&lt;Id, WOS_Resource__c&gt;();
+<i>134</i>&nbsp;        for(WOS_Task__c newTaskInstanceValue: triggerNewMap.values()){
+<i>135</i>&nbsp;            WOS_Task__c oldTaskInstanceValue = triggerOldMap.get(newTaskInstanceValue.Id);
+<i>136</i>&nbsp;            if(newTaskInstanceValue.Assigned_To__c != oldTaskInstanceValue.Assigned_To__c){
+<i>137</i>&nbsp;                dependantResourcesMap.put(newTaskInstanceValue.Assigned_To__c,new WOS_Resource__c());
+<i>138</i>&nbsp;            }
+<i>139</i>&nbsp;        }
+<i>140</i>&nbsp;        for(WOS_Resource__c associatedResource : [SELECT Id, User__c FROM WOS_Resource__c WHERE Id IN :dependantResourcesMap.keySet()]){
+<i>141</i>&nbsp;            dependantResourcesMap.put(associatedResource.Id,associatedResource);
+<i>142</i>&nbsp;        }
+<i>143</i>&nbsp;        for(WOS_Task__c newTaskInstanceValue: triggerNewMap.values()){
+<i>144</i>&nbsp;            tasksToUpdate = new List&lt;WOS_Task__c&gt;();
+<i>145</i>&nbsp;            WOS_Task__c oldTaskInstanceValue = triggerOldMap.get(newTaskInstanceValue.Id);
+<i>146</i>&nbsp;            if(newTaskInstanceValue.Assigned_To__c != oldTaskInstanceValue.Assigned_To__c){
+<i>147</i>&nbsp;                     WOS_Resource__c resource = dependantResourcesMap.get(newTaskInstanceValue.Assigned_To__c);
+<i>148</i>&nbsp;                    newTaskInstanceValue.OwnerId = resource.User__c;
+<i>149</i>&nbsp;                    tasksToUpdate.add(newTaskInstanceValue);  
+<i>150</i>&nbsp;            }
+<i>151</i>&nbsp;        }
+<i>152</i>&nbsp;*/        
+<i>153</i>&nbsp;        
+<i>154</i>&nbsp;        
+<i>155</i>&nbsp;        // Added by Chetan 5/9
+<i>156</i>&nbsp;        
+<i>157</i>&nbsp;    }
+<i>158</i>&nbsp;    
+<b class="nc"><i>159</i>&nbsp;    public void updateAssignedToField(Map&lt;Id, WOS_Task__c&gt; triggerNewMap, Map&lt;Id, WOS_Task__c&gt; triggerOldMap){</b>
+<b class="nc"><i>160</i>&nbsp;        Map&lt;Id, WOS_Resource__c&gt; dependantResourcesMap = new  Map&lt;Id, WOS_Resource__c&gt;();</b>
+<b class="nc"><i>161</i>&nbsp;        for(WOS_Task__c newTaskInstanceValue: triggerNewMap.values()){</b>
+<b class="nc"><i>162</i>&nbsp;            WOS_Task__c oldTaskInstanceValue = triggerOldMap.get(newTaskInstanceValue.Id);</b>
+<b class="nc"><i>163</i>&nbsp;            if(newTaskInstanceValue.Assigned_To__c != oldTaskInstanceValue.Assigned_To__c){</b>
+<b class="nc"><i>164</i>&nbsp;                dependantResourcesMap.put(newTaskInstanceValue.Assigned_To__c,new WOS_Resource__c());</b>
+<i>165</i>&nbsp;            }
+<i>166</i>&nbsp;        }
+<b class="nc"><i>167</i>&nbsp;        for(WOS_Resource__c associatedResource : [SELECT Id, User__c FROM WOS_Resource__c WHERE Id IN :dependantResourcesMap.keySet()]){</b>
+<b class="nc"><i>168</i>&nbsp;            dependantResourcesMap.put(associatedResource.Id,associatedResource);</b>
+<i>169</i>&nbsp;        }
+<b class="nc"><i>170</i>&nbsp;        for(WOS_Task__c newTaskInstanceValue: triggerNewMap.values()){</b>
+<b class="nc"><i>171</i>&nbsp;            WOS_Task__c oldTaskInstanceValue = triggerOldMap.get(newTaskInstanceValue.Id);</b>
+<b class="nc"><i>172</i>&nbsp;            if(newTaskInstanceValue.Assigned_To__c != oldTaskInstanceValue.Assigned_To__c &amp;&amp; newTaskInstanceValue.Assigned_To__c != null){</b>
+<b class="nc"><i>173</i>&nbsp;                     WOS_Resource__c resource = dependantResourcesMap.get(newTaskInstanceValue.Assigned_To__c);</b>
+<b class="nc"><i>174</i>&nbsp;                    newTaskInstanceValue.OwnerId = resource.User__c;</b>
+<i>175</i>&nbsp;                    //tasksToUpdate.add(newTaskInstanceValue);  
+<i>176</i>&nbsp;            }
+<i>177</i>&nbsp;        }
+<i>178</i>&nbsp;    }
+<i>179</i>&nbsp;    
+<i>180</i>&nbsp;    
+<i>181</i>&nbsp;    // Created by Spencer Janis on 05-11-18
+<i>182</i>&nbsp;    // Trifin Labs
+<i>183</i>&nbsp;    // This method checks if all the tasks in a sequence are complete, then marks the tasks in
+<i>184</i>&nbsp;    // the next sequence as ready, or if there are no more sequences mark the work order complete
+<b class="nc"><i>185</i>&nbsp;    public void taskStatusUpdate( Map&lt;Id, WOS_Task__c&gt; triggerNewMap, Map&lt;Id, WOS_Task__c&gt; triggerOldMap ) {</b>
+<i>186</i>&nbsp;        System.debug( &#39;@@@ Entering taskStatusUpdate&#39; );
+<i>187</i>&nbsp;        
+<b class="nc"><i>188</i>&nbsp;        Map&lt;Id, WOS_Task__c&gt; taskToOrderMap = new Map&lt;Id, WOS_Task__c&gt;();</b>
+<i>189</i>&nbsp;        
+<b class="nc"><i>190</i>&nbsp;        Set&lt;WOS_Task__c&gt; taskIds = new Set&lt;WOS_Task__c&gt;();</b>
+<b class="nc"><i>191</i>&nbsp;        List&lt;WOS_Task__c&gt; tasksToUpdate = new List&lt;WOS_Task__c&gt;();</b>
+<i>192</i>&nbsp;        
+<b class="nc"><i>193</i>&nbsp;        List&lt;Id&gt; orderIds = new List&lt;Id&gt;();</b>
+<b class="nc"><i>194</i>&nbsp;        List&lt;WOS_Order__c&gt; ordersToUpdate = new List&lt;WOS_Order__c&gt;();</b>
+<i>195</i>&nbsp;        
+<i>196</i>&nbsp;        // Check that the updated task status is changed to &quot;Complete&quot;
+<b class="nc"><i>197</i>&nbsp;        for( WOS_Task__c newTask : triggerNewMap.values() ) {</b>
+<b class="nc"><i>198</i>&nbsp;            WOS_Task__c oldTask = triggerOldMap.get( newTask.Id );</b>
+<i>199</i>&nbsp;            
+<i>200</i>&nbsp;            System.debug( &#39;@@@ oldTask: Id = &#39; + oldTask.Id + &#39;, Status__c = &#39; + oldTask.Status__c  );
+<i>201</i>&nbsp;            System.debug( &#39;@@@ newTask: Id = &#39; + newTask.Id + &#39;, Status__c = &#39; + newTask.Status__c );
+<i>202</i>&nbsp;            
+<b class="nc"><i>203</i>&nbsp;            if( oldTask.Status__c != newTask.Status__c &amp;&amp; newTask.Status__c == &#39;Complete&#39; ) {</b>
+<i>204</i>&nbsp;                System.debug( &#39;@@@ Adding task to taskIds&#39; );
+<b class="nc"><i>205</i>&nbsp;                taskIds.add( oldTask );</b>
+<b class="nc"><i>206</i>&nbsp;                orderIds.add( oldTask.Work_Order__c );</b>
+<b class="nc"><i>207</i>&nbsp;                taskToOrderMap.put( oldTask.Work_Order__c, oldTask );</b>
+<i>208</i>&nbsp;                
+<i>209</i>&nbsp;            }
+<i>210</i>&nbsp;            
+<i>211</i>&nbsp;        }
+<i>212</i>&nbsp;        
+<i>213</i>&nbsp;        // Update the next task in the sequences status to &quot;Ready&quot;
+<b class="nc"><i>214</i>&nbsp;        if( orderIds != null &amp;&amp; orderIds.size() &gt; 0 ) {</b>
+<b class="nc"><i>215</i>&nbsp;            Map&lt;Id, Id&gt; orderIdMap = new Map&lt;Id, Id&gt;();</b>
+<i>216</i>&nbsp;            
+<b class="nc"><i>217</i>&nbsp;            List&lt;WOS_Task__c&gt; allAssociatedTasks = [</b>
+<i>218</i>&nbsp;                SELECT      Id
+<i>219</i>&nbsp;                ,           Status__c
+<i>220</i>&nbsp;                ,           Sequence__c
+<i>221</i>&nbsp;                ,           Work_Order__c
+<i>222</i>&nbsp;                ,           Delta_Task__c
+<i>223</i>&nbsp;                FROM        WOS_Task__c
+<b class="nc"><i>224</i>&nbsp;                WHERE       Work_Order__c IN : orderIds</b>
+<i>225</i>&nbsp;                ORDER BY    Sequence__c ASC
+<i>226</i>&nbsp;            ];
+<i>227</i>&nbsp;            System.debug( &#39;@@@ allAssociatedTasks &#39; + allAssociatedTasks );
+<i>228</i>&nbsp;            
+<b class="nc"><i>229</i>&nbsp;            Decimal finalIdx;</b>
+<i>230</i>&nbsp;            
+<b class="nc"><i>231</i>&nbsp;            for( WOS_Task__c task : allAssociatedTasks ) {</b>
+<i>232</i>&nbsp;                System.debug( &#39;@@@ task: &#39; + task );
+<i>233</i>&nbsp;                
+<b class="nc"><i>234</i>&nbsp;                WOS_Task__c originalTask = taskToOrderMap.get( task.Work_Order__c );</b>
+<b class="nc"><i>235</i>&nbsp;                Id workOrder = orderIdMap.get( task.Work_Order__c );</b>
+<i>236</i>&nbsp;                
+<b class="nc"><i>237</i>&nbsp;                Decimal idx = originalTask.Sequence__c;</b>
+<i>238</i>&nbsp;                
+<b class="nc"><i>239</i>&nbsp;                if( task.Status__c == &#39;Complete&#39; &amp;&amp; workOrder == null ) {</b>
+<b class="nc"><i>240</i>&nbsp;                    orderIdMap.put( task.Work_Order__c, task.Work_Order__c );</b>
+<i>241</i>&nbsp;                    
+<i>242</i>&nbsp;                } else {
+<i>243</i>&nbsp;                    
+<b class="nc"><i>244</i>&nbsp;                    if( task.Sequence__c == idx &amp;&amp; task.Status__c != &#39;Complete&#39; &amp;&amp; task.Id != originalTask.Id ) {</b>
+<b class="nc"><i>245</i>&nbsp;                        finalIdx = task.Sequence__c;</b>
+<i>246</i>&nbsp;                    }
+<b class="nc"><i>247</i>&nbsp;                    if( finalIdx == null &amp;&amp; task.Sequence__c &gt; idx ) {</b>
+<b class="nc"><i>248</i>&nbsp;                        finalIdx = task.Sequence__c;</b>
+<b class="nc"><i>249</i>&nbsp;                        task.Status__c = &#39;Ready&#39;;</b>
+<b class="nc"><i>250</i>&nbsp;                        if (task.Delta_Task__c) {</b>
+<b class="nc"><i>251</i>&nbsp;                           task.Status__c = &#39;In Progress&#39;; </b>
+<i>252</i>&nbsp;                        }
+<b class="nc"><i>253</i>&nbsp;                        tasksToUpdate.add( task );</b>
+<b class="nc"><i>254</i>&nbsp;                        orderIdMap.remove( task.Work_Order__c );</b>
+<i>255</i>&nbsp;                        
+<i>256</i>&nbsp;                    } else {
+<b class="nc"><i>257</i>&nbsp;                        if( finalIdx != null &amp;&amp; task.Sequence__c == finalIdx ) {</b>
+<b class="nc"><i>258</i>&nbsp;                            finalIdx = task.Sequence__c;</b>
+<b class="nc"><i>259</i>&nbsp;                            task.Status__c = &#39;Ready&#39;;</b>
+<b class="nc"><i>260</i>&nbsp;                            if (task.Delta_Task__c) {</b>
+<b class="nc"><i>261</i>&nbsp;                               task.Status__c = &#39;In Progress&#39;; </b>
+<i>262</i>&nbsp;                            }
+<b class="nc"><i>263</i>&nbsp;                            tasksToUpdate.add( task );</b>
+<b class="nc"><i>264</i>&nbsp;                            orderIdMap.remove( task.Work_Order__c );</b>
+<i>265</i>&nbsp;                            
+<i>266</i>&nbsp;                        }
+<i>267</i>&nbsp;                        
+<i>268</i>&nbsp;                    }
+<i>269</i>&nbsp;                    
+<i>270</i>&nbsp;                }
+<i>271</i>&nbsp;                
+<i>272</i>&nbsp;            }
+<i>273</i>&nbsp;            
+<b class="nc"><i>274</i>&nbsp;            ordersToUpdate = [</b>
+<i>275</i>&nbsp;                SELECT  Id
+<i>276</i>&nbsp;                ,       Name
+<i>277</i>&nbsp;                ,       Work_Order_Status__c
+<i>278</i>&nbsp;                FROM    WOS_Order__c
+<b class="nc"><i>279</i>&nbsp;                WHERE   Id IN : orderIdMap.values()</b>
+<i>280</i>&nbsp;            ];
+<i>281</i>&nbsp;            
+<b class="nc"><i>282</i>&nbsp;            for( WOS_Order__c order : ordersToUpdate ) {</b>
+<b class="nc"><i>283</i>&nbsp;                order.Work_Order_Status__c = &#39;Complete&#39;;</b>
+<i>284</i>&nbsp;            }
+<i>285</i>&nbsp;            
+<i>286</i>&nbsp;        }
+<i>287</i>&nbsp;        
+<b class="nc"><i>288</i>&nbsp;        if( tasksToUpdate != null &amp;&amp; tasksToUpdate.size() &gt; 0 ){</b>
+<i>289</i>&nbsp;            System.debug( &#39;@@@ Tasks To Update &#39; + tasksToUpdate );
+<b class="nc"><i>290</i>&nbsp;            update tasksToUpdate;            </b>
+<i>291</i>&nbsp;        }
+<i>292</i>&nbsp;        
+<b class="nc"><i>293</i>&nbsp;        if( ordersToUpdate != null &amp;&amp; ordersToUpdate.size() &gt; 0 ){</b>
+<i>294</i>&nbsp;            System.debug( &#39;@@@ Orders To Update &#39; + ordersToUpdate );
+<b class="nc"><i>295</i>&nbsp;            update ordersToUpdate;</b>
+<i>296</i>&nbsp;        }
+<i>297</i>&nbsp;        
+<i>298</i>&nbsp;    }
+<i>299</i>&nbsp;    // End - Spencer Janis 05-11-18
+<i>300</i>&nbsp;    
+<i>301</i>&nbsp;    //Created By Nitin Paliwal
+<i>302</i>&nbsp;    //This method will update the status of Work order based on the Task status update
+<i>303</i>&nbsp;    //Below mentioned updates will happen
+<i>304</i>&nbsp;    //If ANY TASK is switched to &quot;Hold&quot; or &quot;Review Required&quot; - The WO Status should switch to &quot;Hold&quot; 
+<i>305</i>&nbsp;	//Once that task goes back to &quot;In-Progress&quot; or &quot;Complete&quot; the WO Status should switch back to &quot;in-Progress&quot; - unless it&#39;s the last task in the sequence, in which case the WO Status should change to complete (if the task is complete) 
+<i>306</i>&nbsp;
+<i>307</i>&nbsp;    
+<b class="nc"><i>308</i>&nbsp;    public void updateWorkOrderStatus(map&lt;Id,WOS_Task__c&gt; newTaskMap,map&lt;Id,WOS_Task__c&gt; oldTaskMap){</b>
+<b class="nc"><i>309</i>&nbsp;        set&lt;Id&gt; workOrderIds = new set&lt;Id&gt;();</b>
+<b class="nc"><i>310</i>&nbsp;        set&lt;Id&gt; inprogressIds = new set&lt;Id&gt;();</b>
+<i>311</i>&nbsp;        
+<b class="nc"><i>312</i>&nbsp;        list&lt;WOS_Order__c&gt; updatedWorkOrderRecords = new list&lt;WOS_Order__c&gt;();</b>
+<b class="nc"><i>313</i>&nbsp;        for(WOS_Task__c taskRec : newTaskMap.values()){</b>
+<b class="nc"><i>314</i>&nbsp;            if(taskRec.Status__c != oldTaskMap.get(taskRec.Id).Status__c ){</b>
+<b class="nc"><i>315</i>&nbsp;                workOrderIds.add(taskRec.Work_Order__c);</b>
+<i>316</i>&nbsp;            }
+<i>317</i>&nbsp;            
+<i>318</i>&nbsp;        }
+<b class="nc"><i>319</i>&nbsp;        for(WOS_Order__c woRec : [select Id,Work_Order_Status__c,(select Id,Status__c from Tasks__r) from WOS_Order__c where Id in:workOrderIds ]){</b>
+<b class="nc"><i>320</i>&nbsp;            integer recCount = 0;</b>
+<b class="nc"><i>321</i>&nbsp;            woRec.Work_Order_Status__c = &#39;In Progress&#39;;</b>
+<b class="nc"><i>322</i>&nbsp;            for(WOS_Task__c taskRec : woRec.Tasks__r){</b>
+<b class="nc"><i>323</i>&nbsp;                if(taskRec.Status__c == &#39;Hold&#39; || taskRec.Status__c == &#39;Requires Review&#39;){</b>
+<b class="nc"><i>324</i>&nbsp;                    woRec.Work_Order_Status__c = &#39;Hold&#39;;</b>
+<b class="nc"><i>325</i>&nbsp;                    break;</b>
+<i>326</i>&nbsp;                }
+<b class="nc"><i>327</i>&nbsp;                else if(taskRec.Status__c == &#39;Complete&#39;){</b>
+<b class="nc"><i>328</i>&nbsp;                    ++recCount;</b>
+<i>329</i>&nbsp;                }   
+<i>330</i>&nbsp;            }
+<b class="nc"><i>331</i>&nbsp;            if(recCount == woRec.Tasks__r.size()){</b>
+<b class="nc"><i>332</i>&nbsp;                woRec.Work_Order_Status__c = &#39;Complete&#39;;</b>
+<i>333</i>&nbsp;            	
+<i>334</i>&nbsp;            }
+<b class="nc"><i>335</i>&nbsp;            updatedWorkOrderRecords.add(woRec);</b>
+<i>336</i>&nbsp;        }
+<b class="nc"><i>337</i>&nbsp;        update updatedWorkOrderRecords;</b>
+<i>338</i>&nbsp;    }
+<b class="nc"><i>339</i>&nbsp;    public void taskFirePlatformEventUpdate( List&lt;WOS_Task__c&gt; triggerNew, List&lt;WOS_Task__c&gt; triggerOld )</b>
+<i>340</i>&nbsp;    {
+<b class="nc"><i>341</i>&nbsp;        if((triggerOld.isEmpty()) || (triggerNew[0].Fire_Platform_Event__c == triggerOld[0].Fire_Platform_Event__c) )</b>
+<i>342</i>&nbsp;        {
+<b class="nc"><i>343</i>&nbsp;            integer var;</b>
+<b class="nc"><i>344</i>&nbsp;            for(var = 0; var &lt; triggerNew.size(); var++)</b>
+<b class="nc"><i>345</i>&nbsp;            {</b>
+<b class="nc"><i>346</i>&nbsp;                if(var ==0)</b>
+<i>347</i>&nbsp;                {
+<b class="nc"><i>348</i>&nbsp;                    triggerNew[var].Fire_Platform_Event__c = true;</b>
+<i>349</i>&nbsp;                }
+<i>350</i>&nbsp;                else
+<i>351</i>&nbsp;                {
+<b class="nc"><i>352</i>&nbsp;                    triggerNew[var].Fire_Platform_Event__c = false;</b>
+<i>353</i>&nbsp;                }
+<i>354</i>&nbsp;            }
+<i>355</i>&nbsp;        }
+<i>356</i>&nbsp;    }
+<i>357</i>&nbsp;    
+<i>358</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-12-06 13:57</div>
+</div>
+</body>
+</html>

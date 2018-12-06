@@ -1,0 +1,238 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: qcReportBeforeInsertOrUpdate</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">default</a> ]
+</div>
+
+<h1>Coverage Summary for Class: qcReportBeforeInsertOrUpdate (default)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">qcReportBeforeInsertOrUpdate</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 50)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+<h2>qcReportBeforeInsertOrUpdate</h2>
+<div class="sourceCode"><i>1</i>&nbsp;trigger qcReportBeforeInsertOrUpdate on QA_QC_Report__c (before insert , before update) {
+<b class="nc"><i>2</i>&nbsp;    QA_QC_Report__c qcReport = Trigger.New[0]; // Variable to refer the newly created QC Report Instance</b>
+<i>3</i>&nbsp;    
+<b class="nc"><i>4</i>&nbsp;    Boolean isMasteringRecord = (qcReport.RecordTypeId == Schema.SObjectType.QA_QC_Report__c.getRecordTypeInfosByName().get(&#39;Mastering/Distribution Services Report&#39;).getRecordTypeId());</b>
+<b class="nc"><i>5</i>&nbsp;    Boolean isDCPRecord = (qcReport.RecordTypeId == Schema.SObjectType.QA_QC_Report__c.getRecordTypeInfosByName().get(&#39;DCP Report&#39;).getRecordTypeId());    </b>
+<i>6</i>&nbsp;    
+<b class="nc"><i>7</i>&nbsp;    Boolean elementIdChanged = false;</b>
+<b class="nc"><i>8</i>&nbsp;    if (Trigger.isInsert) // In case of insert just check if Element Id is null</b>
+<i>9</i>&nbsp;    {
+<b class="nc"><i>10</i>&nbsp;        elementIdChanged = (Trigger.New[0].Salesforce_Asset_ID__c != null);</b>
+<i>11</i>&nbsp;    }
+<i>12</i>&nbsp;    
+<b class="nc"><i>13</i>&nbsp;    if (Trigger.isUpdate) // In case of update check previous and new Element Id values. </b>
+<i>14</i>&nbsp;    {
+<b class="nc"><i>15</i>&nbsp;        elementIdChanged = (Trigger.Old[0].Salesforce_Asset_ID__c != Trigger.New[0].Salesforce_Asset_ID__c);</b>
+<i>16</i>&nbsp;    }
+<i>17</i>&nbsp;    
+<b class="nc"><i>18</i>&nbsp;    if(elementIdChanged)</b>
+<i>19</i>&nbsp;    {
+<i>20</i>&nbsp;        // Gets the select assets
+<b class="nc"><i>21</i>&nbsp;        QA_Asset__c selectedAsset = [</b>
+<i>22</i>&nbsp;            select Id, Asset_Name__c, Aspect_Ratio__c, Asset_Creation_Date__c, Asset_Type__c, Audio_Bit_Depth__c, Audio_Language__c, Audio_Type__c, Encryption__c, Frame_Rate__c, Resolution_Standard__c, Reel_s__c, Sample_Rate__c, Sublanguage_s__c, Territory__c, Asset_Version_Number__c
+<i>23</i>&nbsp;            from QA_Asset__c
+<b class="nc"><i>24</i>&nbsp;            where Id = :Trigger.New[0].Salesforce_Asset_ID__c</b>
+<i>25</i>&nbsp;        ];
+<i>26</i>&nbsp;        
+<i>27</i>&nbsp;        //// Update QC record instance with values from asset
+<b class="nc"><i>28</i>&nbsp;        qcReport.Aspect_Ratio__c = selectedAsset.Aspect_Ratio__c;</b>
+<b class="nc"><i>29</i>&nbsp;        qcReport.Audio_Bit_Depth__c = selectedAsset.Audio_Bit_Depth__c;</b>
+<b class="nc"><i>30</i>&nbsp;        qcReport.Asset_Version_Number__c = selectedAsset.Asset_Version_Number__c;</b>
+<b class="nc"><i>31</i>&nbsp;        qcReport.Asset_Type__c = selectedAsset.Asset_Type__c;</b>
+<b class="nc"><i>32</i>&nbsp;        qcReport.Audio_Language__c = selectedAsset.Audio_Language__c;</b>
+<b class="nc"><i>33</i>&nbsp;        qcReport.Frame_Rate__c = selectedAsset.Frame_Rate__c;</b>
+<b class="nc"><i>34</i>&nbsp;        qcReport.Sample_Rate__c = selectedAsset.Sample_Rate__c;</b>
+<i>35</i>&nbsp;        
+<b class="nc"><i>36</i>&nbsp;        if(isMasteringRecord)</b>
+<i>37</i>&nbsp;        {
+<b class="nc"><i>38</i>&nbsp;            qcReport.Asset_Creation_Date__c = selectedAsset.Asset_Creation_Date__c;</b>
+<b class="nc"><i>39</i>&nbsp;            qcReport.Resolution_Standard__c = selectedAsset.Resolution_Standard__c;</b>
+<i>40</i>&nbsp;            
+<i>41</i>&nbsp;        }
+<i>42</i>&nbsp;        
+<b class="nc"><i>43</i>&nbsp;        if(isDCPRecord)</b>
+<i>44</i>&nbsp;        {
+<b class="nc"><i>45</i>&nbsp;            qcReport.Audio_Type__c = selectedAsset.Audio_Type__c;</b>
+<b class="nc"><i>46</i>&nbsp;            qcReport.Encryption__c = selectedAsset.Encryption__c;</b>
+<b class="nc"><i>47</i>&nbsp;            qcReport.Reel_s__c = selectedAsset.Reel_s__c;</b>
+<b class="nc"><i>48</i>&nbsp;            qcReport.Sublanguage_s__c = selectedAsset.Sublanguage_s__c;</b>
+<b class="nc"><i>49</i>&nbsp;            qcReport.Territory__c = selectedAsset.Territory__c;            </b>
+<i>50</i>&nbsp;        }
+<i>51</i>&nbsp;        
+<i>52</i>&nbsp;        
+<i>53</i>&nbsp;    }   
+<i>54</i>&nbsp; 
+<b class="nc"><i>55</i>&nbsp;    String ApprovalValidationMessage = &#39;&#39;;</b>
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    /*
+<i>58</i>&nbsp;    // Common
+<i>59</i>&nbsp;    ApprovalValidationMessage += (qcReport.QC_Type__c == NULL) ? &#39;\nMissing Field : QC Type&#39; : &#39;&#39;;
+<i>60</i>&nbsp;    ApprovalValidationMessage += (qcReport.Report_Type__c == NULL) ? &#39;\nMissing Field : Report Type&#39; : &#39;&#39;;
+<i>61</i>&nbsp;    ApprovalValidationMessage += (qcReport.Report_Status__c == NULL) ? &#39;\nMissing Field : Report Status&#39; : &#39;&#39;;
+<i>62</i>&nbsp;    ApprovalValidationMessage += (qcReport.Order_Information_Verified__c) ? &#39;&#39; : &#39;\nMissing Field : Order Information Verified&#39; ;
+<i>63</i>&nbsp;    ApprovalValidationMessage += (qcReport.Playback_Device__c == NULL) ? &#39;\nMissing Field : Playback Device&#39; : &#39;&#39;;
+<i>64</i>&nbsp;    ApprovalValidationMessage += (qcReport.QC_Room__c == NULL) ? &#39;\nMissing Field : QC Room&#39; : &#39;&#39;;
+<i>65</i>&nbsp;    ApprovalValidationMessage += (qcReport.QC_Manager__c == NULL) ? &#39;\nMissing Field : QC Manager&#39; : &#39;&#39;;
+<i>66</i>&nbsp;    ApprovalValidationMessage += (qcReport.File_Size__c == NULL) ? &#39;\nMissing Field : File Size&#39; : &#39;&#39;;
+<i>67</i>&nbsp;    ApprovalValidationMessage += (qcReport.Aspect_Ratio__c == NULL) ? &#39;\nMissing Field : Aspect Ratio&#39; : &#39;&#39;;
+<i>68</i>&nbsp;    ApprovalValidationMessage += (qcReport.Aspect_Ratio_Status__c == NULL) ? &#39;\nMissing Field : Aspect Ratio Status&#39; : &#39;&#39;;
+<i>69</i>&nbsp;    ApprovalValidationMessage += (qcReport.Audio_Language__c == NULL) ? &#39;\nMissing Field : Audio Language&#39; : &#39;&#39;;
+<i>70</i>&nbsp;    ApprovalValidationMessage += (qcReport.Audio_Language_Status__c == NULL) ? &#39;\nMissing Field : Audio Language Status&#39; : &#39;&#39;;
+<i>71</i>&nbsp;    ApprovalValidationMessage += (qcReport.Asset_Information_Verified__c) ? &#39;&#39; : &#39;\nMissing Field : Asset Information Verified&#39; ;
+<i>72</i>&nbsp;    ApprovalValidationMessage += (qcReport.QC_Operator_1__c == NULL) ? &#39;\nMissing Field : QC Operator #1&#39; : &#39;&#39;;
+<i>73</i>&nbsp;  
+<i>74</i>&nbsp;
+<i>75</i>&nbsp; 
+<i>76</i>&nbsp;    // Mastering Record Type
+<i>77</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.QC_Description__c == NULL)) ? &#39;\nMissing Field : QC Description&#39; : &#39;&#39;;
+<i>78</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.QC_Vendor__c == NULL)) ? &#39;\nMissing Field : QC Vendor&#39; : &#39;&#39;;
+<i>79</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; qcReport.Asset_Type__c == NULL) ? &#39;\nMissing Field : Asset Type&#39; : &#39;&#39;;
+<i>80</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Asset_Type_Status__c == NULL)) ? &#39;\nMissing Field : Asset Type Status&#39; : &#39;&#39;;
+<i>81</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Asset_Creation_Date_Status__c == NULL)) ? &#39;\nMissing Field : Asset Creation Date Status&#39; : &#39;&#39;;
+<i>82</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Audio_Bit_Depth__c == NULL)) ? &#39;\nMissing Field : Audio Bit Depth&#39; : &#39;&#39;;
+<i>83</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Audio_Bit_Depth_Status__c == NULL)) ? &#39;\nMissing Field : Audio Bit Depth Status&#39; : &#39;&#39;;
+<i>84</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Audio_Data_Rate__c == NULL)) ? &#39;\nMissing Field : Audio Data Rate&#39; : &#39;&#39;;
+<i>85</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Head_Logo_s__c == NULL)) ? &#39;\nMissing Field : Head Logo(s)&#39; : &#39;&#39;;
+<i>86</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Tail_Logo_s__c == NULL)) ? &#39;\nMissing Field : Tail Logo(s)&#39; : &#39;&#39;;
+<i>87</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Chroma_Sampling_Rate__c == NULL)) ? &#39;\nMissing Field : Chroma Sampling Rate&#39; : &#39;&#39;;
+<i>88</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Color_Encoding__c == NULL)) ? &#39;\nMissing Field : Color Encoding&#39; : &#39;&#39;;
+<i>89</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Field_1_Frame_1_Progressive_First_Line__c == NULL)) ? &#39;\nMissing Field : Field 1/Frame 1/Progressive First Line&#39; : &#39;&#39;;
+<i>90</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Field_1_Frame_1_Progressive_Last_Line__c == NULL)) ? &#39;\nMissing Field : Field 1/Frame 1/Progressive Last Line&#39; : &#39;&#39;;
+<i>91</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Field_2_Frame_2_First_Line__c == NULL)) ? &#39;\nMissing Field : Field 2/Frame 2 First Line&#39; : &#39;&#39;;
+<i>92</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Field_2_Frame_2_Last_Line__c == NULL)) ? &#39;\nMissing Field : Field 2/Frame 2 Last Line&#39; : &#39;&#39;;
+<i>93</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Horizontal_Blanking__c == NULL)) ? &#39;\nMissing Field : Horizontal Blanking&#39; : &#39;&#39;;
+<i>94</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Black_Set_Up_Level_Avg__c == NULL)) ? &#39;\nMissing Field : Black/Set-Up Level Avg&#39; : &#39;&#39;;
+<i>95</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Black_Set_Up_Level_Max__c == NULL)) ? &#39;\nMissing Field : Black/Set-Up Level Max&#39; : &#39;&#39;;
+<i>96</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Black_Set_Up_Level_TC__c == NULL)) ? &#39;\nMissing Field : Black/Set-Up Level TC&#39; : &#39;&#39;;
+<i>97</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Chroma_Level_Avg__c == NULL)) ? &#39;\nMissing Field : Chroma Level Avg&#39; : &#39;&#39;;
+<i>98</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Chroma_Level_Max__c == NULL)) ? &#39;\nMissing Field : Chroma Level Max&#39; : &#39;&#39;;
+<i>99</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Chroma_Level_TC__c == NULL)) ? &#39;\nMissing Field : Chroma Level TC&#39; : &#39;&#39;;
+<i>100</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Luma_Level_Avg__c == NULL)) ? &#39;\nMissing Field : Luma Level Avg&#39; : &#39;&#39;;
+<i>101</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Luma_Level_Max__c == NULL)) ? &#39;\nMissing Field : Luma Level Max&#39; : &#39;&#39;;
+<i>102</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Luma_Level_TC__c == NULL)) ? &#39;\nMissing Field : Luma Level TC&#39; : &#39;&#39;;
+<i>103</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Metadata_File_Range__c == NULL)) ? &#39;\nMissing Field : Metadata File Range&#39; : &#39;&#39;;
+<i>104</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Pixel_Count_Start__c == NULL)) ? &#39;\nMissing Field : Pixel Count Start&#39; : &#39;&#39;;
+<i>105</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Pixel_Count_End__c == NULL)) ? &#39;\nMissing Field : Pixel Count End&#39; : &#39;&#39;;
+<i>106</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.QC_Tested_Value_Range__c == NULL)) ? &#39;\nMissing Field : QC Tested Value Range&#39; : &#39;&#39;;
+<i>107</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Actual_File_Range__c == NULL)) ? &#39;\nMissing Field : Actual File Range&#39; : &#39;&#39;;
+<i>108</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; !qcReport.Tech_Specs_Verified__c) ? &#39;\nMissing Field : Tech Specs Verified&#39; : &#39;&#39;;
+<i>109</i>&nbsp;    ApprovalValidationMessage += (isMasteringRecord &amp;&amp; (qcReport.Channels_Verified__c == NULL)) ? &#39;\nMissing Field : Channels Verified&#39; : &#39;&#39;;
+<i>110</i>&nbsp;    
+<i>111</i>&nbsp;    // DCP Record Type
+<i>112</i>&nbsp;    ApprovalValidationMessage += (isDCPRecord &amp;&amp; (qcReport.Server_Used__c == NULL)) ? &#39;\nMissing Field : Server Used&#39; : &#39;&#39;;
+<i>113</i>&nbsp;    ApprovalValidationMessage += (isDCPRecord &amp;&amp; (qcReport.Audio_Type__c == NULL)) ? &#39;\nMissing Field : Audio Type&#39; : &#39;&#39;;
+<i>114</i>&nbsp;    ApprovalValidationMessage += (isDCPRecord &amp;&amp; (qcReport.Territory__c == NULL)) ? &#39;\nMissing Field : Territory&#39; : &#39;&#39;;
+<i>115</i>&nbsp;    ApprovalValidationMessage += (isDCPRecord &amp;&amp; (qcReport.Audio_Assignment_Status__c == NULL)) ? &#39;\nMissing Field : Audio Assignment Status&#39; : &#39;&#39;;
+<i>116</i>&nbsp;    ApprovalValidationMessage += (isDCPRecord &amp;&amp; (qcReport.Audio_Type_Status__c == NULL)) ? &#39;\nMissing Field : Audio Type Status&#39; : &#39;&#39;;
+<i>117</i>&nbsp;    ApprovalValidationMessage += (isDCPRecord &amp;&amp; (qcReport.Image_Audio_Sync_Status__c == NULL)) ? &#39;\nMissing Field : Image Audio Sync Status&#39; : &#39;&#39;;
+<i>118</i>&nbsp;    ApprovalValidationMessage += (isDCPRecord &amp;&amp; (qcReport.Encryption_of_All_Picture_Audio_Assets__c == NULL)) ? &#39;\nMissing Field : Encryption of All Picture/Audio Assets&#39; : &#39;&#39;;
+<i>119</i>&nbsp;    ApprovalValidationMessage += (isDCPRecord &amp;&amp; (qcReport.Reel_Boundaries_Status__c == NULL)) ? &#39;\nMissing Field : Reel Boundaries Status&#39; : &#39;&#39;;
+<i>120</i>&nbsp;    ApprovalValidationMessage += (isDCPRecord &amp;&amp; (qcReport.EDR_Metadata_Flag_Status__c == NULL)) ? &#39;\nMissing Field : EDR Metadata Flag Status&#39; : &#39;&#39;;
+<i>121</i>&nbsp;    ApprovalValidationMessage += (isDCPRecord &amp;&amp; (qcReport.Subtitle_Language_s_Status__c == NULL)) ? &#39;\nMissing Field : Subtitle Language(s) Status&#39; : &#39;&#39;;
+<i>122</i>&nbsp;    ApprovalValidationMessage += (isDCPRecord &amp;&amp; (qcReport.Subtitle_Captions_Sync_Placement_Color__c == NULL)) ? &#39;\nMissing Field : Subtitle/Captions Sync,Placement,Color&#39; : &#39;&#39;;
+<i>123</i>&nbsp;    ApprovalValidationMessage += (isDCPRecord &amp;&amp; (qcReport.Localized_Content_Proofs_Supplied__c == NULL)) ? &#39;\nMissing Field : Localized Content Proofs Supplied&#39; : &#39;&#39;;
+<i>124</i>&nbsp;    ApprovalValidationMessage += (isDCPRecord &amp;&amp; (qcReport.Inserts_Status__c == NULL)) ? &#39;\nMissing Field : Inserts Status&#39; : &#39;&#39;;
+<i>125</i>&nbsp;    }
+<i>126</i>&nbsp;*/
+<i>127</i>&nbsp;
+<i>128</i>&nbsp;    
+<b class="nc"><i>129</i>&nbsp;    qcReport.Approval_Readiness_Indicator__c = ApprovalValidationMessage.length() &lt;= 0; </b>
+<b class="nc"><i>130</i>&nbsp;    qcReport.Approval_Validation_Message__c = ApprovalValidationMessage;</b>
+<i>131</i>&nbsp;    
+<i>132</i>&nbsp;
+<b class="nc"><i>133</i>&nbsp;    if(qcReport.Final_Review_Status__c == &#39;Final Review Complete&#39;)</b>
+<i>134</i>&nbsp;    {
+<b class="nc"><i>135</i>&nbsp;        List&lt;QA_Issue_Line_Item__c&gt; issueLineItems = [</b>
+<i>136</i>&nbsp;            SELECT Id, Component__c, Description__c, Issue_Type__c, Action_Item_Created__c, Final_Severity__c, Final_Status__c, QC_Evaluation__c, Severity__c, QC_Report__c, QC_Status__c, QC_Report_Cloned__c
+<i>137</i>&nbsp;            FROM QA_Issue_Line_Item__c
+<b class="nc"><i>138</i>&nbsp;            WHERE Action_Item_Created__c = false  AND Final_Status__c = &#39;Rejected&#39; AND QC_Report__c = :qcReport.Id</b>
+<i>139</i>&nbsp;        ];
+<i>140</i>&nbsp;        
+<b class="nc"><i>141</i>&nbsp;        List&lt;QA_Action_Item__c&gt; actionItemsToCreate = new List&lt;QA_Action_Item__c&gt;();</b>
+<b class="nc"><i>142</i>&nbsp;        List&lt;QA_Issue_Line_Item__c&gt; updatedIssueLineItems = new List&lt;QA_Issue_Line_Item__c&gt;();</b>
+<i>143</i>&nbsp;        
+<b class="nc"><i>144</i>&nbsp;        QA_Action_Item__c actionItemInstance;</b>
+<b class="nc"><i>145</i>&nbsp;        for(QA_Issue_Line_Item__c islInstance : issueLineItems){</b>
+<b class="nc"><i>146</i>&nbsp;            actionItemInstance = new QA_Action_Item__c();</b>
+<b class="nc"><i>147</i>&nbsp;            actionItemInstance.Component__c = islInstance.Component__c;</b>
+<b class="nc"><i>148</i>&nbsp;            actionItemInstance.Description__c = islInstance.Description__c;</b>
+<b class="nc"><i>149</i>&nbsp;            actionItemInstance.Issue_Type__c = islInstance.Issue_Type__c;</b>
+<b class="nc"><i>150</i>&nbsp;            actionItemInstance.Issue_Line_Item__c = islInstance.Id;</b>
+<b class="nc"><i>151</i>&nbsp;            actionItemInstance.QC_Report__c = qcReport.Id;</b>
+<b class="nc"><i>152</i>&nbsp;            actionItemsToCreate.add(actionItemInstance);</b>
+<i>153</i>&nbsp;            
+<b class="nc"><i>154</i>&nbsp;            islInstance.Action_Item_Created__c = true;</b>
+<b class="nc"><i>155</i>&nbsp;            updatedIssueLineItems.add(islInstance);</b>
+<i>156</i>&nbsp;        }
+<i>157</i>&nbsp;        
+<b class="nc"><i>158</i>&nbsp;        if(actionItemsToCreate.size() &gt; 0){</b>
+<b class="nc"><i>159</i>&nbsp;            insert actionItemsToCreate;            </b>
+<i>160</i>&nbsp;        }
+<i>161</i>&nbsp;
+<b class="nc"><i>162</i>&nbsp;        if(updatedIssueLineItems.size() &gt; 0){</b>
+<b class="nc"><i>163</i>&nbsp;            update updatedIssueLineItems;</b>
+<i>164</i>&nbsp;        }
+<i>165</i>&nbsp;    }
+<i>166</i>&nbsp;    
+<i>167</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-12-06 13:57</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,163 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: workOrderTaskDetail_Controller</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">default</a> ]
+</div>
+
+<h1>Coverage Summary for Class: workOrderTaskDetail_Controller (default)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">workOrderTaskDetail_Controller</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+<h2>workOrderTaskDetail_Controller</h2>
+<div class="sourceCode"><i>1</i>&nbsp;// Created by Spencer Janis on 05-01-18
+<i>2</i>&nbsp;// Trifin Labs
+<i>3</i>&nbsp;
+<i>4</i>&nbsp;public with sharing class workOrderTaskDetail_Controller {
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;    @AuraEnabled
+<b class="nc"><i>7</i>&nbsp;    public static List&lt;WOS_Task__c&gt; getWorkOrderTasks(Id workOrderId) {</b>
+<b class="nc"><i>8</i>&nbsp;        List&lt;WOS_Task__c&gt; taskList = new List&lt;WOS_Task__c&gt;();</b>
+<i>9</i>&nbsp;
+<b class="nc"><i>10</i>&nbsp;        for ( WOS_Task__c task : [</b>
+<i>11</i>&nbsp;            SELECT Id, Task_Name__c, Due_Date__c, Assigned_To__r.User__r.Name
+<i>12</i>&nbsp;            FROM WOS_Task__c
+<b class="nc"><i>13</i>&nbsp;            WHERE Work_Order__c = : workOrderId</b>
+<i>14</i>&nbsp;			ORDER BY Sequence__c ASC
+<b class="nc"><i>15</i>&nbsp;        ]) {</b>
+<b class="nc"><i>16</i>&nbsp;            taskList.add( task );</b>
+<i>17</i>&nbsp;        }
+<b class="nc"><i>18</i>&nbsp;        return taskList;</b>
+<i>19</i>&nbsp;    }
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    @AuraEnabled
+<b class="nc"><i>22</i>&nbsp;    public static List&lt;WOS_Task__c&gt; getTasks(Id taskId) {</b>
+<b class="nc"><i>23</i>&nbsp;        WOS_Task__c childTask = [select Id, Work_Order__c from WOS_Task__c where Id = : taskId];</b>
+<b class="nc"><i>24</i>&nbsp;        WOS_Order__c workOrder = [select Id from WOS_Order__c where Id = : childTask.Work_Order__c];</b>
+<i>25</i>&nbsp;
+<b class="nc"><i>26</i>&nbsp;        List&lt;WOS_Task__c&gt; taskList = new List&lt; WOS_Task__c &gt;();</b>
+<i>27</i>&nbsp;         /* [
+<i>28</i>&nbsp;            SELECT Id, Task_Name__c, Work_Order__c 
+<i>29</i>&nbsp;            FROM WOS_Task__c 
+<i>30</i>&nbsp;            WHERE Id = : taskId
+<i>31</i>&nbsp;        ]);*/
+<i>32</i>&nbsp;
+<b class="nc"><i>33</i>&nbsp;        for ( WOS_Task__c task :	[</b>
+<i>34</i>&nbsp;            						select		Id
+<i>35</i>&nbsp;                          			, 			Task_Name__c
+<i>36</i>&nbsp;                                    ,           Due_Date__c
+<i>37</i>&nbsp;                                    ,           Assigned_To__r.User__r.Name
+<i>38</i>&nbsp;                               		from 		WOS_Task__c
+<b class="nc"><i>39</i>&nbsp;                                	where 		Work_Order__c = : workOrder.Id</b>
+<i>40</i>&nbsp;									order by	Sequence__c asc
+<b class="nc"><i>41</i>&nbsp;        							] ) {</b>
+<b class="nc"><i>42</i>&nbsp;            taskList.add( task );</b>
+<i>43</i>&nbsp;
+<i>44</i>&nbsp;        }
+<i>45</i>&nbsp;        system.debug(taskList);
+<b class="nc"><i>46</i>&nbsp;        return taskList;</b>
+<i>47</i>&nbsp;    }
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;    @AuraEnabled
+<b class="nc"><i>50</i>&nbsp;    public static List&lt;WOS_Source__c&gt; getWorkOrderSources(Id taskId) {</b>
+<b class="nc"><i>51</i>&nbsp;        List&lt;WOS_Source__c&gt; sourceList = new List&lt; WOS_Source__c &gt;([</b>
+<i>52</i>&nbsp;            SELECT Id, Name__c, File_Path__c  
+<i>53</i>&nbsp;            FROM WOS_Source__c 
+<b class="nc"><i>54</i>&nbsp;            WHERE Task__c = :taskId</b>
+<i>55</i>&nbsp;            AND Source_Task__c = true
+<i>56</i>&nbsp;        ]);
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;        /*for ( WOS_Source__c source :	[
+<i>59</i>&nbsp;            							select		Id
+<i>60</i>&nbsp;            							, 			Name__c
+<i>61</i>&nbsp;            							from		WOS_Source__c
+<i>62</i>&nbsp;            							where 		Task__c = : taskId
+<i>63</i>&nbsp;        								] ) {
+<i>64</i>&nbsp;            sourceList.add( source );
+<i>65</i>&nbsp;        }*/
+<b class="nc"><i>66</i>&nbsp;        return sourceList;</b>
+<i>67</i>&nbsp;    }
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;    @AuraEnabled
+<b class="nc"><i>70</i>&nbsp;    public static List&lt;WOS_Source__c&gt; getTaskSources(Id taskId) {</b>
+<i>71</i>&nbsp;        //WOS_Task__c childTask = [select Id, Work_Order__c from WOS_Task__c where Id = : taskId];
+<i>72</i>&nbsp;        //WOS_Order__c workOrder = [select Id from WOS_Order__c where Id = : childTask.Work_Order__c];
+<b class="nc"><i>73</i>&nbsp;        List&lt;WOS_Source__c&gt; sourceList = new List&lt; WOS_Source__c &gt;([</b>
+<i>74</i>&nbsp;            SELECT Id, Name__c, File_Path__c 
+<i>75</i>&nbsp;            FROM WOS_Source__c 
+<b class="nc"><i>76</i>&nbsp;            WHERE Task__c = :taskId</b>
+<i>77</i>&nbsp;            AND Source_Task__c = true
+<i>78</i>&nbsp;        ]);
+<i>79</i>&nbsp;        
+<i>80</i>&nbsp;        /*for ( WOS_Source__c source :	[
+<i>81</i>&nbsp;            							select		Id
+<i>82</i>&nbsp;            							, 			Name__c
+<i>83</i>&nbsp;            							,			File_Path__c
+<i>84</i>&nbsp;            							from		WOS_Source__c
+<i>85</i>&nbsp;            							where 		Task__c = : taskId
+<i>86</i>&nbsp;        								] ) {
+<i>87</i>&nbsp;            sourceList.add( source );
+<i>88</i>&nbsp;        }*/
+<b class="nc"><i>89</i>&nbsp;        return sourceList;</b>
+<i>90</i>&nbsp;    }
+<i>91</i>&nbsp;
+<i>92</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-12-06 13:57</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,190 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: widgetCreateQCReportClass</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">default</a> ]
+</div>
+
+<h1>Coverage Summary for Class: widgetCreateQCReportClass (default)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">widgetCreateQCReportClass</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 74)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+<h2>widgetCreateQCReportClass</h2>
+<div class="sourceCode"><i>1</i>&nbsp;public class widgetCreateQCReportClass {
+<i>2</i>&nbsp;    
+<b class="nc"><i>3</i>&nbsp;    public static Boolean skipTrigger = False;</b>
+<i>4</i>&nbsp;    
+<i>5</i>&nbsp;    @AuraEnabled
+<b class="nc"><i>6</i>&nbsp;    public static QA_QC_Report__c saveReportWithAsset(QA_QC_Report__c report, Id assetId, String recordType, String reportType) {</b>
+<b class="nc"><i>7</i>&nbsp;        try{</b>
+<i>8</i>&nbsp;            // Perform isAccessible() and isUpdateable() checks here
+<b class="nc"><i>9</i>&nbsp;            report.Salesforce_Asset_ID__c = assetId;</b>
+<b class="nc"><i>10</i>&nbsp;            report.QC_Date__c = system.now();</b>
+<b class="nc"><i>11</i>&nbsp;            report.Report_Type__c = reportType;</b>
+<b class="nc"><i>12</i>&nbsp;            report.RecordTypeId = recordType;</b>
+<b class="nc"><i>13</i>&nbsp;            insert report;</b>
+<i>14</i>&nbsp;        } catch (Exception e) {
+<i>15</i>&nbsp;            system.debug(e);
+<i>16</i>&nbsp;        }
+<b class="nc"><i>17</i>&nbsp;        return report;</b>
+<i>18</i>&nbsp;    }
+<i>19</i>&nbsp;    
+<i>20</i>&nbsp;    @AuraEnabled
+<b class="nc"><i>21</i>&nbsp;    public static QA_QC_Report__c cloneReportWithRelatedRecords(Id recordId) {</b>
+<i>22</i>&nbsp;        
+<b class="nc"><i>23</i>&nbsp;        Savepoint sp = Database.setSavepoint();</b>
+<b class="nc"><i>24</i>&nbsp;        QA_QC_Report__c originalReport;</b>
+<b class="nc"><i>25</i>&nbsp;        QA_QC_Report__c clonedReport;</b>
+<b class="nc"><i>26</i>&nbsp;        Id clonedReportId;</b>
+<b class="nc"><i>27</i>&nbsp;        try{</b>
+<b class="nc"><i>28</i>&nbsp;			originalReport = Database.query(&#39;select Id, Salesforce_Asset_ID__c, RecordTypeId, Report_Type__c, Actual_File_Range__c, Aspect_Ratio__c, Asset_Creation_Date__c, Asset_Type__c, Asset_Version_Number__c, Audio_Bit_Depth__c, Audio_Language__c, Audio_Type__c, Black_Set_Up_Level_Avg__c, Black_Set_Up_Level_Max__c, Black_Set_Up_Level_TC__c, Chroma_Level_Avg__c, Chroma_Level_Max__c, Chroma_Level_TC__c, Chroma_Sampling_Rate__c, Client_Contact__c, Closed_Captions__c, Color_Encoding__c, Comments_Notes__c, CPL_Info__c, Created_From__c, CSR_Manager__c, DCFM__c, Digital_Operator__c, Encryption__c, Field_1_Frame_1_Progressive_First_Line__c, Field_1_Frame_1_Progressive_Last_Line__c, Field_2_Frame_2_First_Line__c, Field_2_Frame_2_Last_Line__c, File_Creation_Facility__c, File_Size__c, Forced_Narratives__c, Frame_Rate__c, Head_Logo_s__c, Horizontal_Blanking__c, List_Source__c, Localized_Inserts__c, Localized_Subtitles__c, Luma_Level_Avg__c, Luma_Level_Max__c, Luma_Level_TC__c, Metadata_File_Range__c, Pixel_Count_End__c, Pixel_Count_Start__c, Playback_Device__c, QC_Description__c, QC_Manager__c, QC_Operator_1__c, QC_Operator_2__c, QC_Operator_3__c, QC_Room__c, QC_Tested_Value_Range__c, QC_Type__c, QC_Vendor__c, Reel_s__c, Resolution_Standard__c, Sample_Rate__c, Server_Used__c, Sublanguage_s__c, Superimposed_Text__c, Tail_Logo_s__c, Territory__c, Textless_at_Tail__c, Titles_in_Safe_Action__c, Total_Runtime__c, Two_Pop_at_Head__c, Two_Pop_at_Tail__c, Vendor_W_O__c, Vertical_Blanking__c, Video_Peak_Level_Avg__c, Video_Peak_Level_Max__c, Video_Peak_Level_TC__c, Series_Name__c, Season_Number__c, Episode_Number__c, Bonus_Title__c, EIDR_2__c, Test_Facility__c, QC_Speaker_Config__c, Automated_QC_Tools__c, Inserts_Reference__c, Release_Evaluation__c, Release_Eval_Date__c, Video_Codec__c, Video_Bit_Depth__c, Audio_Frequency__c, Audio_Codec__c from QA_QC_Report__c where id = :recordId&#39;); </b>
+<b class="nc"><i>29</i>&nbsp;            clonedReport = originalReport.clone(false);</b>
+<b class="nc"><i>30</i>&nbsp;            clonedReport.Approval_Readiness_Indicator__c = false;</b>
+<b class="nc"><i>31</i>&nbsp;            clonedReport.Asset_Information_Verified__c = false;</b>
+<b class="nc"><i>32</i>&nbsp;            clonedReport.Order_Information_Verified__c = false;</b>
+<b class="nc"><i>33</i>&nbsp;            clonedReport.QC_Date__c = system.now();</b>
+<b class="nc"><i>34</i>&nbsp;            clonedReport.Is_Cloned__c=true;</b>
+<b class="nc"><i>35</i>&nbsp;            clonedReport.Rush__c = false;</b>
+<b class="nc"><i>36</i>&nbsp;            clonedReport.Tech_Specs_Verified__c = false;</b>
+<b class="nc"><i>37</i>&nbsp;            clonedReport.Verified__c = false;</b>
+<b class="nc"><i>38</i>&nbsp;            clonedReport.Is_Cloned__c = true;</b>
+<b class="nc"><i>39</i>&nbsp;            insert clonedReport;</b>
+<i>40</i>&nbsp;            
+<b class="nc"><i>41</i>&nbsp;            clonedReportId = clonedReport.id;</b>
+<i>42</i>&nbsp;            
+<b class="nc"><i>43</i>&nbsp;            List&lt;QA_Issue_Line_Item__c&gt; issueLineItems = new List&lt;QA_Issue_Line_Item__c&gt;();            </b>
+<b class="nc"><i>44</i>&nbsp;            for (QA_Issue_Line_Item__c ili : [Select c.Id, c.Asset_Name__c, c.Component__c, c.Description__c, c.Issue_Type__c, c.QC_Evaluation__c, c.QC_Status__c, c.Final_Status__c, c.Severity__c, c.Final_Severity__c, c.TC_In__c, c.TC_Out__c, c.Parent_Issue_Line_Item__c, c.Component_Language__c, c.Component_Classification__c, c.Checklist_ID__c, c.Component_ID__c FROM QA_Issue_Line_Item__c c where QC_Report__c = :originalReport.id and QC_Evaluation__c != &#39;Fixed&#39;]) {</b>
+<b class="nc"><i>45</i>&nbsp;                QA_Issue_Line_Item__c newIli = ili.clone(false);</b>
+<b class="nc"><i>46</i>&nbsp;                newIli.QC_Report__c = clonedReportId;</b>
+<i>47</i>&nbsp;                //added so as to know if the issue line item is cloned
+<b class="nc"><i>48</i>&nbsp;                newIli.Is_Cloned__c = true;</b>
+<b class="nc"><i>49</i>&nbsp;                issueLineItems.add(newIli);</b>
+<i>50</i>&nbsp;            }
+<b class="nc"><i>51</i>&nbsp;            skipTrigger = True;</b>
+<b class="nc"><i>52</i>&nbsp;            insert issueLineItems;</b>
+<b class="nc"><i>53</i>&nbsp;   			skipTrigger = False;</b>
+<i>54</i>&nbsp;            
+<i>55</i>&nbsp;            
+<b class="nc"><i>56</i>&nbsp;            List&lt;QA_General_Issue__c&gt; generalLineItems = new List&lt;QA_General_Issue__c&gt;();            </b>
+<b class="nc"><i>57</i>&nbsp;            for (QA_General_Issue__c ili : [SELECT c.Id, c.Asset_Name__c, c.Component__c, c.Description__c, c.Issue_Type__c, c.QC_Evaluation__c, c.Severity__c FROM QA_General_Issue__c c where QC_Report__c = :originalReport.id]) {</b>
+<b class="nc"><i>58</i>&nbsp;                QA_General_Issue__c newIli = ili.clone(false);</b>
+<b class="nc"><i>59</i>&nbsp;				newIli.QC_Report__c = clonedReportId;</b>
+<b class="nc"><i>60</i>&nbsp;                generalLineItems.add(newIli);</b>
+<i>61</i>&nbsp;            }
+<b class="nc"><i>62</i>&nbsp;            insert generalLineItems;</b>
+<i>63</i>&nbsp;            
+<b class="nc"><i>64</i>&nbsp;            List&lt;QA_Audio_Configuration__c&gt; audioConfigurationItems = new List&lt;QA_Audio_Configuration__c&gt;();            </b>
+<b class="nc"><i>65</i>&nbsp;            for (QA_Audio_Configuration__c ili : [SELECT c.Id, c.Asset_Name__c, c.Average__c, c.Channel__c, c.Configuration__c, c.Language__c, c.Peak__c, c.Title__c, c.Audio_Type__c, c.Loudness__c FROM QA_Audio_Configuration__c c where c.QC_Report__c = :originalReport.id]) {</b>
+<b class="nc"><i>66</i>&nbsp;                QA_Audio_Configuration__c newIli = ili.clone(false);</b>
+<b class="nc"><i>67</i>&nbsp;                newIli.QC_Report__c = clonedReportId;</b>
+<b class="nc"><i>68</i>&nbsp;                audioConfigurationItems.add(newIli);</b>
+<i>69</i>&nbsp;            }
+<b class="nc"><i>70</i>&nbsp;            insert audioConfigurationItems;</b>
+<i>71</i>&nbsp;            
+<b class="nc"><i>72</i>&nbsp;            List&lt;Subtitles__c&gt; subtitles = new List&lt;Subtitles__c&gt;();</b>
+<b class="nc"><i>73</i>&nbsp;            for (Subtitles__c ili : [SELECT Id, Type__c, Language__c, Color__c FROM Subtitles__c WHERE QC_Report__c = :originalReport.id]) {</b>
+<b class="nc"><i>74</i>&nbsp;                Subtitles__c newIli = ili.clone(false);</b>
+<b class="nc"><i>75</i>&nbsp;                newIli.QC_Report__c = clonedReportId;</b>
+<b class="nc"><i>76</i>&nbsp;                subtitles.add(newIli);</b>
+<i>77</i>&nbsp;            }
+<b class="nc"><i>78</i>&nbsp;            insert subtitles;</b>
+<i>79</i>&nbsp;            
+<b class="nc"><i>80</i>&nbsp;            List&lt;Dub_Cards__c&gt; dubCards = new List&lt;Dub_Cards__c&gt;();</b>
+<b class="nc"><i>81</i>&nbsp;            for (Dub_Cards__c ili : [SELECT Id, Type__c, Language__c FROM Dub_Cards__c WHERE QC_Report__c = :originalReport.id]) {</b>
+<b class="nc"><i>82</i>&nbsp;                Dub_Cards__c newIli = ili.clone(false);</b>
+<b class="nc"><i>83</i>&nbsp;                newIli.QC_Report__c = clonedReportId;</b>
+<b class="nc"><i>84</i>&nbsp;                dubCards.add(newIli);</b>
+<i>85</i>&nbsp;             }  
+<b class="nc"><i>86</i>&nbsp;             insert  dubCards;</b>
+<i>87</i>&nbsp;            
+<i>88</i>&nbsp;        } catch (Exception e) {
+<i>89</i>&nbsp;            system.debug(e);
+<b class="nc"><i>90</i>&nbsp;            Database.rollback(sp);</b>
+<i>91</i>&nbsp;        }
+<b class="nc"><i>92</i>&nbsp;        return clonedReport;</b>
+<i>93</i>&nbsp;    }
+<i>94</i>&nbsp;    
+<i>95</i>&nbsp;    @AuraEnabled
+<b class="nc"><i>96</i>&nbsp;    public static List&lt;RecordTypeWrapper&gt; fetchQCRecordTypes() {</b>
+<b class="nc"><i>97</i>&nbsp;        List&lt;RecordTypeWrapper&gt; recTypeNameWithId = new List&lt;RecordTypeWrapper&gt;();</b>
+<i>98</i>&nbsp;        
+<b class="nc"><i>99</i>&nbsp;        for (Schema.RecordTypeInfo recInfo : Schema.getGlobalDescribe().get(&#39;QA_QC_Report__c&#39;).getDescribe().getRecordTypeInfosByName().values()) {</b>
+<b class="nc"><i>100</i>&nbsp;            if (recInfo.getName() != &#39;Master&#39;) {</b>
+<b class="nc"><i>101</i>&nbsp;                recTypeNameWithId.add(new RecordTypeWrapper(recInfo.getName(),recInfo.getRecordTypeId()));</b>
+<i>102</i>&nbsp;            }
+<i>103</i>&nbsp;        }
+<i>104</i>&nbsp;        
+<b class="nc"><i>105</i>&nbsp;        return recTypeNameWithId;</b>
+<i>106</i>&nbsp;    }
+<i>107</i>&nbsp;    
+<i>108</i>&nbsp;    public class RecordTypeWrapper {
+<i>109</i>&nbsp;        @auraEnabled
+<i>110</i>&nbsp;        public String recName;
+<i>111</i>&nbsp;        @auraEnabled
+<i>112</i>&nbsp;        public String recId;
+<i>113</i>&nbsp;        
+<b class="nc"><i>114</i>&nbsp;        public RecordTypeWrapper(String recName, String recId) {</b>
+<b class="nc"><i>115</i>&nbsp;            this.recName = recName;</b>
+<b class="nc"><i>116</i>&nbsp;            this.recId = recId;</b>
+<i>117</i>&nbsp;        }
+<i>118</i>&nbsp;    }
+<i>119</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-12-06 13:57</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,82 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: TaskRelatedToPriority</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">default</a> ]
+</div>
+
+<h1>Coverage Summary for Class: TaskRelatedToPriority (default)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TaskRelatedToPriority</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 5)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+<h2>TaskRelatedToPriority</h2>
+<div class="sourceCode"><i>1</i>&nbsp;public with sharing class TaskRelatedToPriority {
+<i>2</i>&nbsp;	@AuraEnabled
+<b class="nc"><i>3</i>&nbsp;    public static list&lt;WOS_Task__c&gt; getRelatedTasks(Id parentWOId){</b>
+<b class="nc"><i>4</i>&nbsp;        return [select Id,Name,Status_Indicator__c ,Ordering__c  from WOS_Task__c </b>
+<b class="nc"><i>5</i>&nbsp;                where Work_Order__c  = :parentWOId order by Ordering__c];</b>
+<i>6</i>&nbsp;    }
+<i>7</i>&nbsp;    @AuraEnabled
+<b class="nc"><i>8</i>&nbsp;    public static void saveRecords(list&lt;WOS_Task__c&gt; taskRecords){</b>
+<b class="nc"><i>9</i>&nbsp;        update taskRecords;</b>
+<i>10</i>&nbsp;    }
+<i>11</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2018-12-06 13:57</div>
+</div>
+</body>
+</html>
